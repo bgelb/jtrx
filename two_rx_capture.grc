@@ -110,13 +110,51 @@ blocks:
     coordinate: [944, 140.0]
     rotation: 0
     state: true
-- name: blocks_null_sink_0
-  id: blocks_null_sink
+- name: blocks_freqshift_cc_0_0
+  id: blocks_freqshift_cc
   parameters:
     affinity: ''
     alias: ''
-    bus_structure_sink: '[[0,],]'
     comment: ''
+    freq: bw/2
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: samp_rate/decim
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [944, 340.0]
+    rotation: 0
+    state: true
+- name: blocks_stream_mux_0
+  id: blocks_stream_mux
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    lengths: (1, 1)
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1160, 248.0]
+    rotation: 0
+    state: true
+- name: blocks_tag_debug_0
+  id: blocks_tag_debug
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    display: 'True'
+    filter: '""'
+    name: ''
     num_inputs: '1'
     type: complex
     vlen: '1'
@@ -124,7 +162,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [168, 432.0]
+    coordinate: [1336, 136.0]
     rotation: 0
     state: true
 - name: blocks_tagged_file_sink_0
@@ -140,7 +178,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1240, 164.0]
+    coordinate: [1344, 220.0]
     rotation: 0
     state: true
 - name: epy_block_0
@@ -209,6 +247,26 @@ blocks:
     coordinate: [688, 92.0]
     rotation: 0
     state: true
+- name: freq_xlating_fir_filter_xxx_0_0
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    center_freq: f_if+bw/2
+    comment: ''
+    decim: decim
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    taps: firdes.low_pass(1.0,samp_rate,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [680, 324.0]
+    rotation: 0
+    state: true
 - name: sdrplay3_rspduo_0
   id: sdrplay3_rspduo
   parameters:
@@ -257,11 +315,15 @@ blocks:
     state: true
 
 connections:
-- [blocks_freqshift_cc_0, '0', blocks_tagged_file_sink_0, '0']
+- [blocks_freqshift_cc_0, '0', blocks_stream_mux_0, '0']
+- [blocks_freqshift_cc_0_0, '0', blocks_stream_mux_0, '1']
+- [blocks_stream_mux_0, '0', blocks_tag_debug_0, '0']
+- [blocks_stream_mux_0, '0', blocks_tagged_file_sink_0, '0']
 - [epy_block_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', blocks_freqshift_cc_0, '0']
+- [freq_xlating_fir_filter_xxx_0_0, '0', blocks_freqshift_cc_0_0, '0']
 - [sdrplay3_rspduo_0, '0', epy_block_0, '0']
-- [sdrplay3_rspduo_0, '1', blocks_null_sink_0, '0']
+- [sdrplay3_rspduo_0, '1', freq_xlating_fir_filter_xxx_0_0, '0']
 
 metadata:
   file_format: 1

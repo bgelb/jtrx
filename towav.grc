@@ -49,6 +49,22 @@ blocks:
     coordinate: [656, 200.0]
     rotation: 0
     state: true
+- name: blocks_complex_to_real_0_0
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [656, 304.0]
+    rotation: 0
+    state: true
 - name: blocks_file_source_0
   id: blocks_file_source
   parameters:
@@ -68,7 +84,26 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [80, 148.0]
+    coordinate: [32, 172.0]
+    rotation: 0
+    state: true
+- name: blocks_stream_demux_0
+  id: blocks_stream_demux
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    lengths: (1, 1)
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_outputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [224, 232.0]
     rotation: 0
     state: true
 - name: blocks_wavfile_sink_0
@@ -82,7 +117,7 @@ blocks:
     bits_per_sample3: FORMAT_VORBIS
     bits_per_sample4: FORMAT_PCM_16
     comment: ''
-    file: outfile
+    file: '''ch1-''+outfile'
     format: FORMAT_WAV
     nchan: '1'
     samp_rate: '12000'
@@ -91,6 +126,28 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1040, 208.0]
+    rotation: 0
+    state: true
+- name: blocks_wavfile_sink_0_0
+  id: blocks_wavfile_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    append: 'False'
+    bits_per_sample1: FORMAT_PCM_16
+    bits_per_sample2: FORMAT_PCM_16
+    bits_per_sample3: FORMAT_VORBIS
+    bits_per_sample4: FORMAT_PCM_16
+    comment: ''
+    file: '''ch2-''+outfile'
+    format: FORMAT_WAV
+    nchan: '1'
+    samp_rate: '12000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1040, 364.0]
     rotation: 0
     state: true
 - name: infile
@@ -144,14 +201,38 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [328, 156.0]
+    coordinate: [440, 140.0]
+    rotation: 0
+    state: true
+- name: rational_resampler_xxx_0_0
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '4'
+    fbw: '0'
+    interp: '3'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: '[]'
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [440, 292.0]
     rotation: 0
     state: true
 
 connections:
 - [blocks_complex_to_real_0, '0', blocks_wavfile_sink_0, '0']
-- [blocks_file_source_0, '0', rational_resampler_xxx_0, '0']
+- [blocks_complex_to_real_0_0, '0', blocks_wavfile_sink_0_0, '0']
+- [blocks_file_source_0, '0', blocks_stream_demux_0, '0']
+- [blocks_stream_demux_0, '0', rational_resampler_xxx_0, '0']
+- [blocks_stream_demux_0, '1', rational_resampler_xxx_0_0, '0']
 - [rational_resampler_xxx_0, '0', blocks_complex_to_real_0, '0']
+- [rational_resampler_xxx_0_0, '0', blocks_complex_to_real_0_0, '0']
 
 metadata:
   file_format: 1
