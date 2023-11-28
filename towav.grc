@@ -117,7 +117,7 @@ blocks:
     bits_per_sample3: FORMAT_VORBIS
     bits_per_sample4: FORMAT_PCM_16
     comment: ''
-    file: '''ch1-''+outfile'
+    file: '''ch1_''+outfile'
     format: FORMAT_WAV
     nchan: '1'
     samp_rate: '12000'
@@ -139,7 +139,7 @@ blocks:
     bits_per_sample3: FORMAT_VORBIS
     bits_per_sample4: FORMAT_PCM_16
     comment: ''
-    file: '''ch2-''+outfile'
+    file: '''ch2_''+outfile'
     format: FORMAT_WAV
     nchan: '1'
     samp_rate: '12000'

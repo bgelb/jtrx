@@ -50,7 +50,7 @@ class towav(gr.top_block):
                 taps=[],
                 fractional_bw=0)
         self.blocks_wavfile_sink_0_0 = blocks.wavfile_sink(
-            'ch2-'+outfile,
+            'ch2_'+outfile,
             1,
             12000,
             blocks.FORMAT_WAV,
@@ -58,7 +58,7 @@ class towav(gr.top_block):
             False
             )
         self.blocks_wavfile_sink_0 = blocks.wavfile_sink(
-            'ch1-'+outfile,
+            'ch1_'+outfile,
             1,
             12000,
             blocks.FORMAT_WAV,
@@ -96,8 +96,8 @@ class towav(gr.top_block):
 
     def set_outfile(self, outfile):
         self.outfile = outfile
-        self.blocks_wavfile_sink_0.open('ch1-'+self.outfile)
-        self.blocks_wavfile_sink_0_0.open('ch2-'+self.outfile)
+        self.blocks_wavfile_sink_0.open('ch1_'+self.outfile)
+        self.blocks_wavfile_sink_0_0.open('ch2_'+self.outfile)
 
 
 
