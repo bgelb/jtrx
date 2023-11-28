@@ -337,8 +337,8 @@ blocks:
     debug_mode: 'True'
     freq_corr: '0'
     if_gRdB: '40'
-    if_gRdB0: '40'
-    if_gRdB1: '40'
+    if_gRdB0: '59'
+    if_gRdB1: '59'
     iq_balance_mode: 'False'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -352,7 +352,7 @@ blocks:
     sample_rate: samp_rate
     sample_rate_non_single_tuner: 2000e3
     sample_sequence_gaps_check: 'True'
-    show_gain_changes: 'False'
+    show_gain_changes: 'True'
   states:
     bus_sink: false
     bus_source: false
