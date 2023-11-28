@@ -2,7 +2,7 @@
 
 WORKDIR=working
 DATADIR=data
-MYCALL=N1VF
+MYCALL=N1VF/L
 MYGRID=CM97AI
 
 export XDG_RUNTIME_DIR="/run/user/1000"
@@ -23,7 +23,7 @@ while [ 1 ] ; do
 	echo "`date`: Processing period $PERIOD_PREV_2..." >> decode.log
 	cat ../$DATADIR/$PERIOD_PREV_2.dat ../$DATADIR/$PERIOD_PREV_1.dat > 2min_temp.dat
 	/usr/bin/python ../towav.py --infile 2min_temp.dat --outfile $PERIOD_PREV_2.wav
-	/usr/bin/wsprd -f 7.0386 ch1_$PERIOD_PREV_2.wav >> decode.log
+	/usr/bin/wsprd -f 0.4742 ch1_$PERIOD_PREV_2.wav >> decode.log
 	rm ch1_$PERIOD_PREV_2.wav
 	rm ch2_$PERIOD_PREV_2.wav
 	rm 2min_temp.dat

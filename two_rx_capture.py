@@ -37,7 +37,7 @@ class two_rx_capture(gr.top_block):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 2000000
-        self.fc = fc = 7038.6e3
+        self.fc = fc = 474.2e3
         self.f_if = f_if = 10e3
         self.decim = decim = 125
         self.bw = bw = 3e3
