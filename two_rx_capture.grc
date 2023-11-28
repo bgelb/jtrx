@@ -162,23 +162,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1336, 136.0]
-    rotation: 0
-    state: true
-- name: blocks_tagged_file_sink_0
-  id: blocks_tagged_file_sink
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    samp_rate: int(samp_rate/decim)
-    type: complex
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1344, 220.0]
+    coordinate: [1392, 144.0]
     rotation: 0
     state: true
 - name: epy_block_0
@@ -191,40 +175,100 @@ blocks:
       import time\nimport pmt\nfrom gnuradio import gr\n\n\nclass blk(gr.sync_block):\
       \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
       \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
-      \ period=120, duration=118):  # only default arguments here\n        \"\"\"\
-      arguments to this function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
-      \            self,\n            name='Periodic Burst Tagger',   # will show\
-      \ up in GRC\n            in_sig=[np.complex64],\n            out_sig=[np.complex64]\n\
+      \ period=120):  # only default arguments here\n        \"\"\"arguments to this\
+      \ function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='Add Timestamp Tag',   # will show up in\
+      \ GRC\n            in_sig=[np.complex64],\n            out_sig=[np.complex64]\n\
       \        )\n        # if an attribute with the same name as a parameter is found,\n\
       \        # a callback is registered (properties work, too).\n        self.period=period\n\
-      \        self.duration=duration\n        self.in_burst=False\n\n    def write_burst_tag(self,\
-      \ state):\n        key = pmt.intern('burst')\n        value = pmt.from_bool(state)\n\
-      \        self.add_item_tag(0, self.nitems_written(0), key, value)\n\n    def\
-      \ write_rxtime_tag(self, tv):\n        sec = int(tv)\n        frac = tv % 1\n\
-      \        key = pmt.intern('rx_time')\n        value = pmt.make_tuple(pmt.from_uint64(sec),\
-      \ pmt.from_double(frac))\n        self.add_item_tag(0, self.nitems_written(0),\
-      \ key, value) \n\n    def work(self, input_items, output_items):\n        now\
-      \ = time.time()\n        if (now % self.period < self.duration) and not self.in_burst:\n\
-      \            self.in_burst = True\n            self.write_burst_tag(True)\n\
-      \            self.write_rxtime_tag(now)\n        elif (now % self.period >=\
-      \ self.duration) and self.in_burst:\n            self.in_burst = False\n   \
-      \         self.write_burst_tag(False)\n            self.write_rxtime_tag(now)\n\
-      \n        output_items[0][:] = input_items[0][:]\n        return len(output_items[0])\n"
+      \        self.last_time=None\n\n    def write_rxtime_tag(self, tv):\n      \
+      \  sec = int(tv)\n        frac = tv % 1\n        key = pmt.intern('rx_time')\n\
+      \        value = pmt.make_tuple(pmt.from_uint64(sec), pmt.from_double(frac))\n\
+      \        self.add_item_tag(0, self.nitems_written(0), key, value) \n\n    def\
+      \ work(self, input_items, output_items):\n        now = time.time()\n      \
+      \  if self.last_time and (now // self.period != self.last_time // self.period):\n\
+      \            self.write_rxtime_tag(now)\n        self.last_time = now\n\n  \
+      \      output_items[0][:] = input_items[0][:]\n        return len(output_items[0])\n"
     affinity: ''
     alias: ''
     comment: ''
-    duration: '118'
     maxoutbuf: '0'
     minoutbuf: '0'
-    period: '120'
+    period: '1'
   states:
-    _io_cache: ('Periodic Burst Tagger', 'blk', [('period', '120'), ('duration', '118')],
-      [('0', 'complex', 1)], [('0', 'complex', 1)], 'Embedded Python Block example
-      - a simple multiply const', ['duration', 'period'])
+    _io_cache: ('Add Timestamp Tag', 'blk', [('period', '120')], [('0', 'complex',
+      1)], [('0', 'complex', 1)], 'Embedded Python Block example - a simple multiply
+      const', ['period'])
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [408, 140.0]
+    rotation: 0
+    state: true
+- name: epy_block_1
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      import pmt\nimport time\nfrom datetime import datetime\nfrom gnuradio import\
+      \ gr\n\nclass blk(gr.sync_block):  # other base classes are basic_block, decim_block,\
+      \ interp_block\n    \"\"\"Embedded Python Block example - a simple multiply\
+      \ const\"\"\"\n\n    def __init__(self, period_sec=120):  # only default arguments\
+      \ here\n        \"\"\"arguments to this function show up as parameters in GRC\"\
+      \"\"\n        gr.sync_block.__init__(\n            self,\n            name='Embedded\
+      \ Python Block',   # will show up in GRC\n            in_sig=[np.complex64],\n\
+      \            out_sig=None\n        )\n        # if an attribute with the same\
+      \ name as a parameter is found,\n        # a callback is registered (properties\
+      \ work, too).\n        self.period_sec = period_sec\n        self.outfile =\
+      \ None\n        self.last_rx_time = None\n\n    def __exit__(self, *args):\n\
+      \        if self.outfile:\n            print('{}: Closing current output file\
+      \ (shutdown).'.format(datetime,now))\n            self.outfile.close()\n\n \
+      \   def is_period_start(self, last_ts, cur_ts):\n        if last_ts:\n     \
+      \       last_period = last_ts[0] // self.period_sec\n            cur_period\
+      \ = cur_ts[0] // self.period_sec\n            assert cur_period >= last_period\n\
+      \            if cur_period > last_period:\n                return True\n   \
+      \     return False\n\n    def update_last_rx_time(self, cur_ts):\n        if\
+      \ cur_ts:\n            self.last_rx_time = cur_ts\n\n    def work(self, input_items,\
+      \ output_items):\n\n        time_pos_list = [(None, self.last_rx_time)]\n\n\
+      \        # find all rx_time tags in input\n        tags = self.get_tags_in_window(0,\
+      \ 0, len(input_items[0]))\n        for tag in tags:\n            key = pmt.to_python(tag.key)\n\
+      \            value = pmt.to_python(tag.value)\n            offset = tag.offset\n\
+      \            pos = offset - self.nitems_read(0)\n            assert pos < (self.nitems_read(0)\
+      \ + len(input_items[0]))\n            if key == 'rx_time':\n               \
+      \ print ('{} => {}'.format(pos, value))\n                time_pos_list.append((pos,\
+      \ value))\n\n        # find all period start boundaries\n        start_pos =\
+      \ None\n        for i in range(1, len(time_pos_list)):\n            if self.is_period_start(time_pos_list[i-1][1],\
+      \ time_pos_list[i][1]):\n                # check there aren't multiple starts\n\
+      \                assert start_pos == None\n                start_pos = time_pos_list[i]\n\
+      \n        self.update_last_rx_time(time_pos_list[-1][1])\n\n        if start_pos:\n\
+      \            period_name = datetime.fromtimestamp(start_pos[1][0]).strftime(\"\
+      %y%m%d_%H%M\")\n            cur_file_items = input_items[0][:start_pos[0]]\n\
+      \            new_file_items = input_items[0][start_pos[0]:]\n\n            #\
+      \ write out items for current file\n            if self.outfile:\n         \
+      \       self.outfile.write(cur_file_items.tobytes())\n                print('{}:\
+      \ Closing current output file.'.format(datetime.now()))\n                self.outfile.close()\n\
+      \n            # write out items for new file\n            filename = period_name\
+      \ + '.dat'\n            print ('{}: New period start at sample {} (ts={:.8f}),\
+      \ opening new output file {}.'.format(datetime.now(), start_pos[0]+self.nitems_read(0),\
+      \ start_pos[1][0]+start_pos[1][1], filename))\n            self.outfile = open(filename,\
+      \ 'wb')\n            self.outfile.write(new_file_items.tobytes())\n\n      \
+      \  elif self.outfile:\n            self.outfile.write(input_items[0].tobytes())\n\
+      \n        return len(input_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    period_sec: '60'
+  states:
+    _io_cache: ('Embedded Python Block', 'blk', [('period_sec', '120')], [('0', 'complex',
+      1)], [], 'Embedded Python Block example - a simple multiply const', ['period_sec'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1424, 496.0]
     rotation: 0
     state: true
 - name: freq_xlating_fir_filter_xxx_0
@@ -318,7 +362,7 @@ connections:
 - [blocks_freqshift_cc_0, '0', blocks_stream_mux_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_stream_mux_0, '1']
 - [blocks_stream_mux_0, '0', blocks_tag_debug_0, '0']
-- [blocks_stream_mux_0, '0', blocks_tagged_file_sink_0, '0']
+- [blocks_stream_mux_0, '0', epy_block_1, '0']
 - [epy_block_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', blocks_freqshift_cc_0, '0']
 - [freq_xlating_fir_filter_xxx_0_0, '0', blocks_freqshift_cc_0_0, '0']

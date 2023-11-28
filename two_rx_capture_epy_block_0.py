@@ -15,24 +15,18 @@ from gnuradio import gr
 class blk(gr.sync_block):  # other base classes are basic_block, decim_block, interp_block
     """Embedded Python Block example - a simple multiply const"""
 
-    def __init__(self, period=120, duration=118):  # only default arguments here
+    def __init__(self, period=120):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,
-            name='Periodic Burst Tagger',   # will show up in GRC
+            name='Add Timestamp Tag',   # will show up in GRC
             in_sig=[np.complex64],
             out_sig=[np.complex64]
         )
         # if an attribute with the same name as a parameter is found,
         # a callback is registered (properties work, too).
         self.period=period
-        self.duration=duration
-        self.in_burst=False
-
-    def write_burst_tag(self, state):
-        key = pmt.intern('burst')
-        value = pmt.from_bool(state)
-        self.add_item_tag(0, self.nitems_written(0), key, value)
+        self.last_time=None
 
     def write_rxtime_tag(self, tv):
         sec = int(tv)
@@ -43,14 +37,9 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
 
     def work(self, input_items, output_items):
         now = time.time()
-        if (now % self.period < self.duration) and not self.in_burst:
-            self.in_burst = True
-            self.write_burst_tag(True)
+        if self.last_time and (now // self.period != self.last_time // self.period):
             self.write_rxtime_tag(now)
-        elif (now % self.period >= self.duration) and self.in_burst:
-            self.in_burst = False
-            self.write_burst_tag(False)
-            self.write_rxtime_tag(now)
+        self.last_time = now
 
         output_items[0][:] = input_items[0][:]
         return len(output_items[0])
