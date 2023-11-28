@@ -152,7 +152,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    display: 'True'
+    display: 'False'
     filter: '""'
     name: ''
     num_inputs: '1'
@@ -215,34 +215,35 @@ blocks:
       import pmt\nimport time\nfrom datetime import datetime\nfrom gnuradio import\
       \ gr\n\nclass blk(gr.sync_block):  # other base classes are basic_block, decim_block,\
       \ interp_block\n    \"\"\"Embedded Python Block example - a simple multiply\
-      \ const\"\"\"\n\n    def __init__(self, period_sec=120):  # only default arguments\
-      \ here\n        \"\"\"arguments to this function show up as parameters in GRC\"\
-      \"\"\n        gr.sync_block.__init__(\n            self,\n            name='Embedded\
-      \ Python Block',   # will show up in GRC\n            in_sig=[np.complex64],\n\
-      \            out_sig=None\n        )\n        # if an attribute with the same\
-      \ name as a parameter is found,\n        # a callback is registered (properties\
-      \ work, too).\n        self.period_sec = period_sec\n        self.outfile =\
-      \ None\n        self.last_rx_time = None\n\n    def __exit__(self, *args):\n\
-      \        if self.outfile:\n            print('{}: Closing current output file\
-      \ (shutdown).'.format(datetime,now))\n            self.outfile.close()\n\n \
-      \   def is_period_start(self, last_ts, cur_ts):\n        if last_ts:\n     \
-      \       last_period = last_ts[0] // self.period_sec\n            cur_period\
-      \ = cur_ts[0] // self.period_sec\n            assert cur_period >= last_period\n\
-      \            if cur_period > last_period:\n                return True\n   \
-      \     return False\n\n    def update_last_rx_time(self, cur_ts):\n        if\
-      \ cur_ts:\n            self.last_rx_time = cur_ts\n\n    def work(self, input_items,\
-      \ output_items):\n\n        time_pos_list = [(None, self.last_rx_time)]\n\n\
-      \        # find all rx_time tags in input\n        tags = self.get_tags_in_window(0,\
+      \ const\"\"\"\n\n    def __init__(self, period_sec=120, debug=False):  # only\
+      \ default arguments here\n        \"\"\"arguments to this function show up as\
+      \ parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n            self,\n\
+      \            name='Rotating File Sink',   # will show up in GRC\n          \
+      \  in_sig=[np.complex64],\n            out_sig=None\n        )\n        # if\
+      \ an attribute with the same name as a parameter is found,\n        # a callback\
+      \ is registered (properties work, too).\n        self.period_sec = period_sec\n\
+      \        self.outfile = None\n        self.debug = debug\n        self.last_rx_time\
+      \ = None\n\n    def __exit__(self, *args):\n        if self.outfile:\n     \
+      \       print('{}: Closing current output file (shutdown).'.format(datetime,now))\n\
+      \            self.outfile.close()\n\n    def is_period_start(self, last_ts,\
+      \ cur_ts):\n        if last_ts:\n            last_period = last_ts[0] // self.period_sec\n\
+      \            cur_period = cur_ts[0] // self.period_sec\n            assert cur_period\
+      \ >= last_period\n            if cur_period > last_period:\n               \
+      \ return True\n        return False\n\n    def update_last_rx_time(self, cur_ts):\n\
+      \        if cur_ts:\n            self.last_rx_time = cur_ts\n\n    def work(self,\
+      \ input_items, output_items):\n\n        time_pos_list = [(None, self.last_rx_time)]\n\
+      \n        # find all rx_time tags in input\n        tags = self.get_tags_in_window(0,\
       \ 0, len(input_items[0]))\n        for tag in tags:\n            key = pmt.to_python(tag.key)\n\
       \            value = pmt.to_python(tag.value)\n            offset = tag.offset\n\
       \            pos = offset - self.nitems_read(0)\n            assert pos < (self.nitems_read(0)\
       \ + len(input_items[0]))\n            if key == 'rx_time':\n               \
-      \ print ('{} => {}'.format(pos, value))\n                time_pos_list.append((pos,\
-      \ value))\n\n        # find all period start boundaries\n        start_pos =\
-      \ None\n        for i in range(1, len(time_pos_list)):\n            if self.is_period_start(time_pos_list[i-1][1],\
-      \ time_pos_list[i][1]):\n                # check there aren't multiple starts\n\
-      \                assert start_pos == None\n                start_pos = time_pos_list[i]\n\
-      \n        self.update_last_rx_time(time_pos_list[-1][1])\n\n        if start_pos:\n\
+      \ if self.debug:\n                    print ('{} => {}'.format(pos, value))\n\
+      \                time_pos_list.append((pos, value))\n\n        # find all period\
+      \ start boundaries\n        start_pos = None\n        for i in range(1, len(time_pos_list)):\n\
+      \            if self.is_period_start(time_pos_list[i-1][1], time_pos_list[i][1]):\n\
+      \                # check there aren't multiple starts\n                assert\
+      \ start_pos == None\n                start_pos = time_pos_list[i]\n\n      \
+      \  self.update_last_rx_time(time_pos_list[-1][1])\n\n        if start_pos:\n\
       \            period_name = datetime.fromtimestamp(start_pos[1][0]).strftime(\"\
       %y%m%d_%H%M\")\n            cur_file_items = input_items[0][:start_pos[0]]\n\
       \            new_file_items = input_items[0][start_pos[0]:]\n\n            #\
@@ -259,12 +260,14 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
+    debug: 'False'
     maxoutbuf: '0'
     minoutbuf: '0'
     period_sec: '60'
   states:
-    _io_cache: ('Embedded Python Block', 'blk', [('period_sec', '120')], [('0', 'complex',
-      1)], [], 'Embedded Python Block example - a simple multiply const', ['period_sec'])
+    _io_cache: ('Rotating File Sink', 'blk', [('period_sec', '120'), ('debug', 'False')],
+      [('0', 'complex', 1)], [], 'Embedded Python Block example - a simple multiply
+      const', ['debug', 'period_sec'])
     bus_sink: false
     bus_source: false
     bus_structure: null

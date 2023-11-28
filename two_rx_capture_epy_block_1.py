@@ -15,11 +15,11 @@ from gnuradio import gr
 class blk(gr.sync_block):  # other base classes are basic_block, decim_block, interp_block
     """Embedded Python Block example - a simple multiply const"""
 
-    def __init__(self, period_sec=120):  # only default arguments here
+    def __init__(self, period_sec=120, debug=False):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,
-            name='Embedded Python Block',   # will show up in GRC
+            name='Rotating File Sink',   # will show up in GRC
             in_sig=[np.complex64],
             out_sig=None
         )
@@ -27,6 +27,7 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
         # a callback is registered (properties work, too).
         self.period_sec = period_sec
         self.outfile = None
+        self.debug = debug
         self.last_rx_time = None
 
     def __exit__(self, *args):
@@ -60,7 +61,8 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
             pos = offset - self.nitems_read(0)
             assert pos < (self.nitems_read(0) + len(input_items[0]))
             if key == 'rx_time':
-                print ('{} => {}'.format(pos, value))
+                if self.debug:
+                    print ('{} => {}'.format(pos, value))
                 time_pos_list.append((pos, value))
 
         # find all period start boundaries
