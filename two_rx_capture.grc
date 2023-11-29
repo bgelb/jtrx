@@ -107,7 +107,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [944, 140.0]
+    coordinate: [1056, 132.0]
     rotation: 0
     state: true
 - name: blocks_freqshift_cc_0_0
@@ -124,7 +124,43 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [944, 340.0]
+    coordinate: [1056, 332.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_xx_0
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '32'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [464, 292.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_xx_1
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '32'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [336, 132.0]
     rotation: 0
     state: true
 - name: blocks_stream_mux_0
@@ -143,7 +179,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1160, 248.0]
+    coordinate: [1272, 240.0]
     rotation: 0
     state: true
 - name: blocks_tag_debug_0
@@ -162,7 +198,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1392, 144.0]
+    coordinate: [1504, 132.0]
     rotation: 0
     state: true
 - name: epy_block_0
@@ -202,7 +238,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [408, 140.0]
+    coordinate: [536, 148.0]
     rotation: 0
     state: true
 - name: epy_block_1
@@ -271,7 +307,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1424, 496.0]
+    coordinate: [1536, 492.0]
     rotation: 0
     state: true
 - name: freq_xlating_fir_filter_xxx_0
@@ -291,7 +327,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [688, 92.0]
+    coordinate: [800, 84.0]
     rotation: 0
     state: true
 - name: freq_xlating_fir_filter_xxx_0_0
@@ -311,7 +347,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [680, 324.0]
+    coordinate: [792, 316.0]
     rotation: 0
     state: true
 - name: sdrplay3_rspduo_0
@@ -364,13 +400,15 @@ blocks:
 connections:
 - [blocks_freqshift_cc_0, '0', blocks_stream_mux_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_stream_mux_0, '1']
+- [blocks_multiply_const_xx_0, '0', freq_xlating_fir_filter_xxx_0_0, '0']
+- [blocks_multiply_const_xx_1, '0', epy_block_0, '0']
 - [blocks_stream_mux_0, '0', blocks_tag_debug_0, '0']
 - [blocks_stream_mux_0, '0', epy_block_1, '0']
 - [epy_block_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', blocks_freqshift_cc_0, '0']
 - [freq_xlating_fir_filter_xxx_0_0, '0', blocks_freqshift_cc_0_0, '0']
-- [sdrplay3_rspduo_0, '0', epy_block_0, '0']
-- [sdrplay3_rspduo_0, '1', freq_xlating_fir_filter_xxx_0_0, '0']
+- [sdrplay3_rspduo_0, '0', blocks_multiply_const_xx_1, '0']
+- [sdrplay3_rspduo_0, '1', blocks_multiply_const_xx_0, '0']
 
 metadata:
   file_format: 1

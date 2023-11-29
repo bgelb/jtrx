@@ -46,7 +46,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [656, 200.0]
+    coordinate: [824, 192.0]
     rotation: 0
     state: true
 - name: blocks_complex_to_real_0_0
@@ -62,7 +62,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [656, 304.0]
+    coordinate: [824, 296.0]
     rotation: 0
     state: true
 - name: blocks_file_source_0
@@ -103,7 +103,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [224, 232.0]
+    coordinate: [208, 200.0]
     rotation: 0
     state: true
 - name: blocks_wavfile_sink_0
@@ -201,7 +201,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [440, 140.0]
+    coordinate: [608, 132.0]
     rotation: 0
     state: true
 - name: rational_resampler_xxx_0_0
@@ -221,7 +221,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [440, 292.0]
+    coordinate: [608, 284.0]
     rotation: 0
     state: true
 

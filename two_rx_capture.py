@@ -80,6 +80,8 @@ class two_rx_capture(gr.top_block):
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "")
         self.blocks_tag_debug_0.set_display(False)
         self.blocks_stream_mux_0 = blocks.stream_mux(gr.sizeof_gr_complex*1, (1, 1))
+        self.blocks_multiply_const_xx_1 = blocks.multiply_const_cc(32, 1)
+        self.blocks_multiply_const_xx_0 = blocks.multiply_const_cc(32, 1)
         self.blocks_freqshift_cc_0_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate/decim))
         self.blocks_freqshift_cc_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate/decim))
 
@@ -89,13 +91,15 @@ class two_rx_capture(gr.top_block):
         ##################################################
         self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_stream_mux_0, 0))
         self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_stream_mux_0, 1))
+        self.connect((self.blocks_multiply_const_xx_0, 0), (self.freq_xlating_fir_filter_xxx_0_0, 0))
+        self.connect((self.blocks_multiply_const_xx_1, 0), (self.epy_block_0, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.epy_block_1, 0))
         self.connect((self.epy_block_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.blocks_freqshift_cc_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0_0, 0), (self.blocks_freqshift_cc_0_0, 0))
-        self.connect((self.sdrplay3_rspduo_0, 0), (self.epy_block_0, 0))
-        self.connect((self.sdrplay3_rspduo_0, 1), (self.freq_xlating_fir_filter_xxx_0_0, 0))
+        self.connect((self.sdrplay3_rspduo_0, 1), (self.blocks_multiply_const_xx_0, 0))
+        self.connect((self.sdrplay3_rspduo_0, 0), (self.blocks_multiply_const_xx_1, 0))
 
 
     def get_samp_rate(self):
