@@ -55,6 +55,8 @@ class towav(gr.top_block):
             False
             )
         self.blocks_stream_demux_0 = blocks.stream_demux(gr.sizeof_gr_complex*1, (1, 1))
+        self.blocks_multiply_const_xx_1 = blocks.multiply_const_ff(64, 1)
+        self.blocks_multiply_const_xx_0 = blocks.multiply_const_ff(64, 1)
         self.blocks_file_source_0 = blocks.file_source(gr.sizeof_gr_complex*1, infile, False, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
         self.blocks_complex_to_real_0_0 = blocks.complex_to_real(1)
@@ -64,9 +66,11 @@ class towav(gr.top_block):
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_wavfile_sink_0, 0))
-        self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_wavfile_sink_0_0, 0))
+        self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_multiply_const_xx_0, 0))
+        self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_multiply_const_xx_1, 0))
         self.connect((self.blocks_file_source_0, 0), (self.blocks_stream_demux_0, 0))
+        self.connect((self.blocks_multiply_const_xx_0, 0), (self.blocks_wavfile_sink_0, 0))
+        self.connect((self.blocks_multiply_const_xx_1, 0), (self.blocks_wavfile_sink_0_0, 0))
         self.connect((self.blocks_stream_demux_0, 0), (self.blocks_complex_to_real_0, 0))
         self.connect((self.blocks_stream_demux_0, 1), (self.blocks_complex_to_real_0_0, 0))
 
