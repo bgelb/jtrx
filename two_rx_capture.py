@@ -36,7 +36,8 @@ class two_rx_capture(gr.top_block):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 2000000
+        self.samp_rate = samp_rate = 62.5e3
+        self.interp = interp = 24
         self.fc = fc = 474.2e3
         self.f_if = f_if = 10e3
         self.decim = decim = 125
@@ -55,12 +56,12 @@ class two_rx_capture(gr.top_block):
                 channels_size=2
             ),
         )
-        self.sdrplay3_rspduo_0.set_sample_rate(2000e3)
+        self.sdrplay3_rspduo_0.set_sample_rate(samp_rate)
         self.sdrplay3_rspduo_0.set_center_freq((fc-f_if))
         self.sdrplay3_rspduo_0.set_bandwidth(0)
         self.sdrplay3_rspduo_0.set_antenna("Both Tuners")
         self.sdrplay3_rspduo_0.set_gain_modes(False, False)
-        self.sdrplay3_rspduo_0.set_gain(-59, -59, 'IF')
+        self.sdrplay3_rspduo_0.set_gain(-35, -35, 'IF')
         self.sdrplay3_rspduo_0.set_gain(-float('0'), -float('0'), 'RF')
         self.sdrplay3_rspduo_0.set_freq_corr(0)
         self.sdrplay3_rspduo_0.set_dc_offset_mode(False)
@@ -73,17 +74,25 @@ class two_rx_capture(gr.top_block):
         self.sdrplay3_rspduo_0.set_debug_mode(True)
         self.sdrplay3_rspduo_0.set_sample_sequence_gaps_check(True)
         self.sdrplay3_rspduo_0.set_show_gain_changes(True)
-        self.freq_xlating_fir_filter_xxx_0_0 = filter.freq_xlating_fir_filter_ccc(decim, firdes.low_pass(1.0,samp_rate,bw/2,100), (f_if+bw/2), samp_rate)
-        self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(decim, firdes.low_pass(1.0,samp_rate,bw/2,100), (f_if+bw/2), samp_rate)
+        self.rational_resampler_xxx_0_0 = filter.rational_resampler_ccc(
+                interpolation=interp,
+                decimation=decim,
+                taps=firdes.low_pass(1.0,samp_rate*interp,bw/2,100),
+                fractional_bw=0)
+        self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
+                interpolation=interp,
+                decimation=decim,
+                taps=firdes.low_pass(1.0,samp_rate*interp,bw/2,100),
+                fractional_bw=0)
         self.epy_block_1 = epy_block_1.blk(period_sec=60, debug=False)
         self.epy_block_0 = epy_block_0.blk(period=1)
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "")
         self.blocks_tag_debug_0.set_display(False)
         self.blocks_stream_mux_0 = blocks.stream_mux(gr.sizeof_gr_complex*1, (1, 1))
-        self.blocks_multiply_const_xx_1 = blocks.multiply_const_cc(32, 1)
-        self.blocks_multiply_const_xx_0 = blocks.multiply_const_cc(32, 1)
-        self.blocks_freqshift_cc_0_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate/decim))
-        self.blocks_freqshift_cc_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate/decim))
+        self.blocks_freqshift_cc_0_2 = blocks.rotator_cc(2.0*math.pi*(-f_if-bw/2)/samp_rate)
+        self.blocks_freqshift_cc_0_1 = blocks.rotator_cc(2.0*math.pi*(-f_if-bw/2)/samp_rate)
+        self.blocks_freqshift_cc_0_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
+        self.blocks_freqshift_cc_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
 
 
         ##################################################
@@ -91,15 +100,15 @@ class two_rx_capture(gr.top_block):
         ##################################################
         self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_stream_mux_0, 0))
         self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_stream_mux_0, 1))
-        self.connect((self.blocks_multiply_const_xx_0, 0), (self.freq_xlating_fir_filter_xxx_0_0, 0))
-        self.connect((self.blocks_multiply_const_xx_1, 0), (self.epy_block_0, 0))
+        self.connect((self.blocks_freqshift_cc_0_1, 0), (self.rational_resampler_xxx_0_0, 0))
+        self.connect((self.blocks_freqshift_cc_0_2, 0), (self.rational_resampler_xxx_0, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.epy_block_1, 0))
-        self.connect((self.epy_block_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
-        self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.blocks_freqshift_cc_0, 0))
-        self.connect((self.freq_xlating_fir_filter_xxx_0_0, 0), (self.blocks_freqshift_cc_0_0, 0))
-        self.connect((self.sdrplay3_rspduo_0, 1), (self.blocks_multiply_const_xx_0, 0))
-        self.connect((self.sdrplay3_rspduo_0, 0), (self.blocks_multiply_const_xx_1, 0))
+        self.connect((self.epy_block_0, 0), (self.blocks_freqshift_cc_0_2, 0))
+        self.connect((self.rational_resampler_xxx_0, 0), (self.blocks_freqshift_cc_0, 0))
+        self.connect((self.rational_resampler_xxx_0_0, 0), (self.blocks_freqshift_cc_0_0, 0))
+        self.connect((self.sdrplay3_rspduo_0, 1), (self.blocks_freqshift_cc_0_1, 0))
+        self.connect((self.sdrplay3_rspduo_0, 0), (self.epy_block_0, 0))
 
 
     def get_samp_rate(self):
@@ -107,10 +116,23 @@ class two_rx_capture(gr.top_block):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate/self.decim))
-        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate/self.decim))
-        self.freq_xlating_fir_filter_xxx_0.set_taps(firdes.low_pass(1.0,self.samp_rate,self.bw/2,100))
-        self.freq_xlating_fir_filter_xxx_0_0.set_taps(firdes.low_pass(1.0,self.samp_rate,self.bw/2,100))
+        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
+        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
+        self.blocks_freqshift_cc_0_1.set_phase_inc(2.0*math.pi*(-self.f_if-self.bw/2)/self.samp_rate)
+        self.blocks_freqshift_cc_0_2.set_phase_inc(2.0*math.pi*(-self.f_if-self.bw/2)/self.samp_rate)
+        self.rational_resampler_xxx_0.set_taps(firdes.low_pass(1.0,self.samp_rate*self.interp,self.bw/2,100))
+        self.rational_resampler_xxx_0_0.set_taps(firdes.low_pass(1.0,self.samp_rate*self.interp,self.bw/2,100))
+        self.sdrplay3_rspduo_0.set_sample_rate(self.samp_rate)
+
+    def get_interp(self):
+        return self.interp
+
+    def set_interp(self, interp):
+        self.interp = interp
+        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
+        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
+        self.rational_resampler_xxx_0.set_taps(firdes.low_pass(1.0,self.samp_rate*self.interp,self.bw/2,100))
+        self.rational_resampler_xxx_0_0.set_taps(firdes.low_pass(1.0,self.samp_rate*self.interp,self.bw/2,100))
 
     def get_fc(self):
         return self.fc
@@ -124,8 +146,8 @@ class two_rx_capture(gr.top_block):
 
     def set_f_if(self, f_if):
         self.f_if = f_if
-        self.freq_xlating_fir_filter_xxx_0.set_center_freq((self.f_if+self.bw/2))
-        self.freq_xlating_fir_filter_xxx_0_0.set_center_freq((self.f_if+self.bw/2))
+        self.blocks_freqshift_cc_0_1.set_phase_inc(2.0*math.pi*(-self.f_if-self.bw/2)/self.samp_rate)
+        self.blocks_freqshift_cc_0_2.set_phase_inc(2.0*math.pi*(-self.f_if-self.bw/2)/self.samp_rate)
         self.sdrplay3_rspduo_0.set_center_freq((self.fc-self.f_if))
 
     def get_decim(self):
@@ -133,20 +155,20 @@ class two_rx_capture(gr.top_block):
 
     def set_decim(self, decim):
         self.decim = decim
-        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate/self.decim))
-        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate/self.decim))
+        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
+        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
 
     def get_bw(self):
         return self.bw
 
     def set_bw(self, bw):
         self.bw = bw
-        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate/self.decim))
-        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate/self.decim))
-        self.freq_xlating_fir_filter_xxx_0.set_taps(firdes.low_pass(1.0,self.samp_rate,self.bw/2,100))
-        self.freq_xlating_fir_filter_xxx_0.set_center_freq((self.f_if+self.bw/2))
-        self.freq_xlating_fir_filter_xxx_0_0.set_taps(firdes.low_pass(1.0,self.samp_rate,self.bw/2,100))
-        self.freq_xlating_fir_filter_xxx_0_0.set_center_freq((self.f_if+self.bw/2))
+        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
+        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/(self.samp_rate*self.interp/self.decim))
+        self.blocks_freqshift_cc_0_1.set_phase_inc(2.0*math.pi*(-self.f_if-self.bw/2)/self.samp_rate)
+        self.blocks_freqshift_cc_0_2.set_phase_inc(2.0*math.pi*(-self.f_if-self.bw/2)/self.samp_rate)
+        self.rational_resampler_xxx_0.set_taps(firdes.low_pass(1.0,self.samp_rate*self.interp,self.bw/2,100))
+        self.rational_resampler_xxx_0_0.set_taps(firdes.low_pass(1.0,self.samp_rate*self.interp,self.bw/2,100))
 
 
 

@@ -184,55 +184,13 @@ blocks:
     coordinate: [272, 20.0]
     rotation: 0
     state: true
-- name: rational_resampler_xxx_0
-  id: rational_resampler_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    decim: '4'
-    fbw: '0'
-    interp: '3'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    taps: '[]'
-    type: ccc
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [608, 132.0]
-    rotation: 0
-    state: true
-- name: rational_resampler_xxx_0_0
-  id: rational_resampler_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    decim: '4'
-    fbw: '0'
-    interp: '3'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    taps: '[]'
-    type: ccc
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [608, 284.0]
-    rotation: 0
-    state: true
 
 connections:
 - [blocks_complex_to_real_0, '0', blocks_wavfile_sink_0, '0']
 - [blocks_complex_to_real_0_0, '0', blocks_wavfile_sink_0_0, '0']
 - [blocks_file_source_0, '0', blocks_stream_demux_0, '0']
-- [blocks_stream_demux_0, '0', rational_resampler_xxx_0, '0']
-- [blocks_stream_demux_0, '1', rational_resampler_xxx_0_0, '0']
-- [rational_resampler_xxx_0, '0', blocks_complex_to_real_0, '0']
-- [rational_resampler_xxx_0_0, '0', blocks_complex_to_real_0_0, '0']
+- [blocks_stream_demux_0, '0', blocks_complex_to_real_0, '0']
+- [blocks_stream_demux_0, '1', blocks_complex_to_real_0_0, '0']
 
 metadata:
   file_format: 1

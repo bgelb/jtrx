@@ -11,9 +11,8 @@
 
 from gnuradio import blocks
 import pmt
-from gnuradio import filter
-from gnuradio.filter import firdes
 from gnuradio import gr
+from gnuradio.filter import firdes
 from gnuradio.fft import window
 import sys
 import signal
@@ -39,16 +38,6 @@ class towav(gr.top_block):
         # Blocks
         ##################################################
 
-        self.rational_resampler_xxx_0_0 = filter.rational_resampler_ccc(
-                interpolation=3,
-                decimation=4,
-                taps=[],
-                fractional_bw=0)
-        self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
-                interpolation=3,
-                decimation=4,
-                taps=[],
-                fractional_bw=0)
         self.blocks_wavfile_sink_0_0 = blocks.wavfile_sink(
             'ch2_'+outfile,
             1,
@@ -78,10 +67,8 @@ class towav(gr.top_block):
         self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_wavfile_sink_0, 0))
         self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_wavfile_sink_0_0, 0))
         self.connect((self.blocks_file_source_0, 0), (self.blocks_stream_demux_0, 0))
-        self.connect((self.blocks_stream_demux_0, 0), (self.rational_resampler_xxx_0, 0))
-        self.connect((self.blocks_stream_demux_0, 1), (self.rational_resampler_xxx_0_0, 0))
-        self.connect((self.rational_resampler_xxx_0, 0), (self.blocks_complex_to_real_0, 0))
-        self.connect((self.rational_resampler_xxx_0_0, 0), (self.blocks_complex_to_real_0_0, 0))
+        self.connect((self.blocks_stream_demux_0, 0), (self.blocks_complex_to_real_0, 0))
+        self.connect((self.blocks_stream_demux_0, 1), (self.blocks_complex_to_real_0_0, 0))
 
 
     def get_infile(self):
