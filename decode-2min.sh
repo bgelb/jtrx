@@ -13,7 +13,10 @@ while [ 1 ] ; do
 	sleep $[ 120 - $(date +%s) % 120  ]
 	TS=`date +%s`
 	PERIOD=`date -d@$TS +%y%m%d_%H%M`
-	
+
+	PURGE_TS=$(($TS-172800))
+	PURGE_DATE=`date -d@$PURGE_TS +%y%m%d_`
+
 	# calc last two one-minute data files to grab
 	PERIOD_PREV_1=`date -d@$(($TS-60)) +%y%m%d_%H%M`
 	PERIOD_PREV_2=`date -d@$(($TS-120)) +%y%m%d_%H%M`
@@ -48,4 +51,6 @@ while [ 1 ] ; do
 	        fi
 	        echo "`date`: curl result: $RESULT , done." >> decode.log
 	fi
+	echo "`date`: Purging $PURGE_DATE*" >> decode.log
+	rm ../$DATADIR/$PURGE_DATE*
 done
