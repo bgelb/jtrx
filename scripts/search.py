@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
 import numpy
+from scipy import signal
+
 sync_vec = [ 1,  1, -1, -1, -1, -1, -1, -1,  1, -1, -1, -1,  1,  1,  1, -1, -1,
        -1,  1, -1, -1,  1, -1,  1,  1,  1,  1, -1, -1, -1, -1, -1, -1, -1,
         1, -1, -1,  1, -1,  1, -1, -1, -1, -1, -1, -1,  1, -1,  1,  1, -1,
@@ -11,6 +13,9 @@ sync_vec = [ 1,  1, -1, -1, -1, -1, -1, -1,  1, -1, -1, -1,  1,  1,  1, -1, -1,
        -1, -1,  1,  1, -1, -1, -1, -1, -1, -1, -1,  1,  1, -1,  1, -1,  1,
         1, -1, -1, -1,  1,  1, -1, -1, -1]
 
+DT=1.0/375.0 # sample period
+DF=375.0/256.0 # freq width of 1 bin
+
 def argument_parser():
     parser = ArgumentParser()
     parser.add_argument(
@@ -18,30 +23,26 @@ def argument_parser():
         help="Set infile [default=%(default)r]")
     return parser
 
-
-def osc(f, n, dt=1.0/375.0):
-    dp = 2*numpy.pi*f*dt
+def osc(f, n):
+    dp = -1*2*numpy.pi*f*DT
     return numpy.exp([1j*dp*i for i in range(n)])
 
-def bin_to_freq(in_bin):
-    return in_bin * 375.0/256.0
+def bin_to_baseband_freq(in_bin):
+  #  assert in_bin >= 0 and in_bin < 128
 
-def bin_power(in_samples, in_bin, fshift=0):
-    assert len(in_samples) == 256
-    f = bin_to_freq(in_bin)+fshift
-    m = osc(f, 256)
-    d = numpy.vdot(m, in_samples)
-    mag = numpy.absolute(d)
-    return mag
+   # return (in_bin - 64) * DF + DF/2
+    return in_bin *DF
 
-def sync(in_samples, start_bin, fshift=0, lag=0):
-    p = []
-    for i in range(162):
-        p.append([bin_power(in_samples[i*256+lag:(i+1)*256+lag], start_bin+b, fshift) for b in range(0,4)])
+def make_input_matrix(input_samples, lag=0):
+    in_vec = numpy.array(input_samples[lag:lag+162*256])
+    out_mat = numpy.reshape(in_vec, [162,256])
+    return out_mat
 
-    cmet = [p[i][1]+p[i][3]-(p[i][0]+p[i][2]) for i in range(0, 162)]
-    correlation = numpy.dot(cmet, sync_vec)
-    return correlation
+def make_osc_matrix():
+    return numpy.array([osc(bin_to_baseband_freq(i), 256) for i in range(-64,64)])
+
+def make_sync_matrix():
+    return numpy.array([numpy.pad([-1,1,-1,1], (i,124-i)) for i in range(125)])
 
 def filter_decimate(input_samples):
     nfft1=1474560
@@ -73,13 +74,18 @@ def main():
     channels = demux(in_items)
     downsampled = filter_decimate(channels[0])
 
-    for l in range(0,1024,32):
-        correlation = []
-        for i in range(1,124):
-            correlation.append((i, sync(downsampled, i, lag=l)))
-    
-        s = sorted(correlation, reverse=True, key=lambda x: x[1])
-        print(l, s[:10])
+    om = make_osc_matrix()
+    sm = make_sync_matrix()
+    for l in range(0, 1024, 32):
+        im = make_input_matrix(downsampled, lag=l)
+
+        ft = numpy.absolute(numpy.matmul(om, im.transpose()))
+        z = numpy.matmul(sm,ft)
+        corr = numpy.matmul(z,sync_vec)
+
+        c = enumerate(corr)
+        s = sorted(c, reverse=True, key=lambda x:x[1])
+        print(s[:10])
 
 if __name__ == '__main__':
     main()
