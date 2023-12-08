@@ -29,16 +29,18 @@ def osc(f, n):
 
 def bin_to_baseband_freq(in_bin):
     assert in_bin >= 0 and in_bin < 128
-    return (in_bin - 64) * DF # + DF/2
-   # return in_bin *DF
+    return (in_bin - 64) * DF + DF/2
+
+def bin_to_af_freq(in_bin):
+    return 1500.0 + bin_to_baseband_freq(in_bin)
 
 def make_input_matrix(input_samples, lag=0):
     in_vec = numpy.array(input_samples[lag:lag+162*256])
     out_mat = numpy.reshape(in_vec, [162,256])
     return out_mat
 
-def make_osc_matrix():
-    return numpy.array([osc(bin_to_baseband_freq(i), 256) for i in range(128)])
+def make_osc_matrix(shift=0):
+    return numpy.array([osc(bin_to_baseband_freq(i)+shift, 256) for i in range(128)])
 
 def make_sync_matrix():
     return numpy.array([numpy.pad([-1,1,-1,1], (i,124-i)) for i in range(125)])
@@ -75,16 +77,19 @@ def main():
 
     om = make_osc_matrix()
     sm = make_sync_matrix()
-    for l in range(0, 1024, 32):
-        im = make_input_matrix(downsampled, lag=l)
+    for d in range(8):
+        shift = d/8 * DF
+        om = make_osc_matrix(shift)
+        for l in range(0, 1024, 32):
+            im = make_input_matrix(downsampled, lag=l)
 
-        ft = numpy.absolute(numpy.matmul(om, im.transpose()))
-        z = numpy.matmul(sm,ft)
-        corr = numpy.matmul(z,sync_vec)
+            ft = numpy.absolute(numpy.matmul(om, im.transpose()))
+            z = numpy.matmul(sm,ft)
+            corr = numpy.matmul(z,sync_vec)
 
-        c = enumerate(corr)
-        s = sorted(c, reverse=True, key=lambda x:x[1])
-        print(s[:10])
+            c = enumerate(corr)
+            s = sorted(c, reverse=True, key=lambda x:x[1])
+            print('freq={}/8, lag={}: {}'.format(d, l, s[:10]))
 
 if __name__ == '__main__':
     main()
