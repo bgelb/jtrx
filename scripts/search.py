@@ -75,24 +75,45 @@ def main():
     buf = f.read()
     in_items = numpy.frombuffer(buf, dtype=numpy.csingle, count=114*12000)
 
+    # channel 0 and 1 are from two different antennas, for now just use antenna 0
     channels = demux(in_items)
     downsampled = filter_decimate(channels[0])
 
     om = make_osc_matrix()
+
+    # sync matrix looks at all sets of 4 adjacent frequency bins, to correlate against sync vector
     sm = make_sync_matrix()
+
+    bin_info = {}
+
     for d in range(8):
         shift = d/8 * DF
         om = make_osc_matrix(shift)
         for l in range(0, 1024, 32):
+
+            # chop up the input samples into 162 256-long vectors, each corresponding to 1 symbol
             im = make_input_matrix(downsampled, lag=l)
 
+            # multiply by a matrix full of "oscillators" spaced 1.46Hz (one frequency shift bin apart). This is basically a discrete fourier transform...
             ft = numpy.absolute(numpy.matmul(om, im.transpose()))
+
+            # compare each starting freq bin vs. the sync vector
             z = numpy.matmul(sm,ft)
             corr = numpy.matmul(z,sync_vec)
 
-            c = enumerate(corr)
-            s = sorted(c, reverse=True, key=lambda x:x[1])
-            print('freq={}/8, lag={}: {}'.format(d, l, s[:10]))
+            # save the best freq/delay for each bin
+            for item in enumerate(corr):
+                if item[0] not in bin_info or bin_info[item[0]]['sync'] < item[1]:
+                    bin_info[item[0]] = {
+                        'sync' : item[1],
+                        'lag' : l,
+                        'shift' : shift
+                    }
+
+    # look at top 20 bins
+    s = sorted(bin_info.items(), reverse=True, key=lambda x:x[1]['sync'])
+    for (k,v) in s[:20]:
+        print('bin={} af={} rf={}: sync={}, lag={}, shift={}'.format(k, bin_to_af_freq(k), bin_to_rf_freq(k), v['sync'], v['lag'], v['shift']))
 
 if __name__ == '__main__':
     main()
