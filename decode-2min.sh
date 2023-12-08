@@ -27,7 +27,11 @@ while [ 1 ] ; do
 	cat ../$DATADIR/$PERIOD_PREV_2.dat ../$DATADIR/$PERIOD_PREV_1.dat > 2min_temp.dat
 	/usr/bin/python ../towav.py --infile 2min_temp.dat --outfile $PERIOD_PREV_2.wav
 
-	for i in {1..2}
+	# magic phase/gain values
+	/usr/bin/python ../phase.py --infile 2min_temp.dat --phi 245.0 --gain 4.85
+	mv combined_out.wav ch3_${PERIOD_PREV_2}.wav
+
+	for i in {1..3}
 	do
 		echo "`date`: Processing Channel $i" >> decode.log
 		/usr/bin/wsprd -d -f 0.4742 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
@@ -39,7 +43,7 @@ while [ 1 ] ; do
 
 		        # upload the spots
 		        echo "`date`: upload by curl" >> decode.log
-		        /usr/bin/curl -F allmept=@wsprdsum_ch$i.out -F call=${MYCALL}${i} -F grid=${MYGRID} http://wsprnet.org/meptspots.php >> decode.log;
+		        /usr/bin/curl -m 10 -F allmept=@wsprdsum_ch$i.out -F call=${MYCALL}${i} -F grid=${MYGRID} http://wsprnet.org/meptspots.php >> decode.log;
 		        RESULT=$?
 
 		        # check if curl uploaded the data successfully
@@ -55,6 +59,7 @@ while [ 1 ] ; do
 
 	rm ch1_$PERIOD_PREV_2.wav
 	rm ch2_$PERIOD_PREV_2.wav
+	rm ch3_$PERIOD_PREV_2.wav
 	rm 2min_temp.dat
 
 	echo "`date`: Purging $PURGE_DATE*" >> decode.log

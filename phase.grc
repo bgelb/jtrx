@@ -149,7 +149,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    is_radians: 'True'
+    is_radians: 'False'
     maxoutbuf: '0'
     minoutbuf: '0'
     shift: phi

@@ -49,7 +49,7 @@ class phase(gr.top_block):
             False
             )
         self.blocks_stream_demux_0 = blocks.stream_demux(gr.sizeof_gr_complex*1, (1, 1))
-        self.blocks_phase_shift_0 = blocks.phase_shift(phi, True)
+        self.blocks_phase_shift_0 = blocks.phase_shift(phi, False)
         self.blocks_multiply_const_xx_2 = blocks.multiply_const_cc(10**(-gain/10), 1)
         self.blocks_multiply_const_xx_1 = blocks.multiply_const_cc(10**(gain/10), 1)
         self.blocks_multiply_const_xx_0 = blocks.multiply_const_ff(64, 1)
