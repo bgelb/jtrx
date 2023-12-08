@@ -89,7 +89,7 @@ def main():
     for d in range(8):
         shift = d/8 * DF
         om = make_osc_matrix(shift)
-        for l in range(0, 1024, 32):
+        for l in range(0, 1024, 25):
 
             # chop up the input samples into 162 256-long vectors, each corresponding to 1 symbol
             im = make_input_matrix(downsampled, lag=l)
@@ -113,7 +113,7 @@ def main():
     # look at top 20 bins
     s = sorted(bin_info.items(), reverse=True, key=lambda x:x[1]['sync'])
     for (k,v) in s[:20]:
-        print('bin={} af={} rf={}: sync={}, lag={}, shift={}'.format(k, bin_to_af_freq(k), bin_to_rf_freq(k), v['sync'], v['lag'], v['shift']))
+        print('bin={} af={} rf={}: sync={}, lag={} ({:.2f}s), shift={}'.format(k, bin_to_af_freq(k), bin_to_rf_freq(k), v['sync'], v['lag'], v['lag']/375.0-1, v['shift']))
 
 if __name__ == '__main__':
     main()
