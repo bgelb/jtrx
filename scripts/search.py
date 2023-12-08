@@ -28,10 +28,9 @@ def osc(f, n):
     return numpy.exp([1j*dp*i for i in range(n)])
 
 def bin_to_baseband_freq(in_bin):
-  #  assert in_bin >= 0 and in_bin < 128
-
-   # return (in_bin - 64) * DF + DF/2
-    return in_bin *DF
+    assert in_bin >= 0 and in_bin < 128
+    return (in_bin - 64) * DF # + DF/2
+   # return in_bin *DF
 
 def make_input_matrix(input_samples, lag=0):
     in_vec = numpy.array(input_samples[lag:lag+162*256])
@@ -39,7 +38,7 @@ def make_input_matrix(input_samples, lag=0):
     return out_mat
 
 def make_osc_matrix():
-    return numpy.array([osc(bin_to_baseband_freq(i), 256) for i in range(-64,64)])
+    return numpy.array([osc(bin_to_baseband_freq(i), 256) for i in range(128)])
 
 def make_sync_matrix():
     return numpy.array([numpy.pad([-1,1,-1,1], (i,124-i)) for i in range(125)])
