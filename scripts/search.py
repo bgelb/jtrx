@@ -32,7 +32,10 @@ def bin_to_baseband_freq(in_bin):
     return (in_bin - 64) * DF + DF/2
 
 def bin_to_af_freq(in_bin):
-    return 1500.0 + bin_to_baseband_freq(in_bin)
+    return 1500.0 + bin_to_baseband_freq(in_bin) + 1.5*DF
+
+def bin_to_rf_freq(in_bin):
+    return 475700 + bin_to_baseband_freq(in_bin) + 1.5*DF
 
 def make_input_matrix(input_samples, lag=0):
     in_vec = numpy.array(input_samples[lag:lag+162*256])
