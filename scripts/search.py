@@ -68,6 +68,12 @@ def filter_decimate(input_samples):
 def demux(muxed):
     return [muxed[idx::2] for idx in range(2)]
 
+def combine(channels, gain, phi):
+    assert len(channels) == 2
+    assert phi >= 0 and phi < 360.0
+
+    return channels[0] * 10**(gain/10) + channels[1] * 10**(-gain/10) * numpy.exp(1j*(phi/360.0)*2*numpy.pi)
+
 def main():
     options = argument_parser().parse_args()
 
@@ -77,7 +83,7 @@ def main():
 
     # channel 0 and 1 are from two different antennas, for now just use antenna 0
     channels = demux(in_items)
-    downsampled = filter_decimate(channels[0])
+    downsampled = [filter_decimate(channels[0]), filter_decimate(channels[1])]
 
     om = make_osc_matrix()
 
@@ -86,34 +92,41 @@ def main():
 
     bin_info = {}
 
-    for d in range(8):
-        shift = d/8 * DF
-        om = make_osc_matrix(shift)
-        for l in range(0, 1024, 25):
+    for phi in range(0, 350, 30):
+        for g in range(0, 9, 1):
+            #combined = downsampled[0]
+            combined = combine(downsampled, g, phi)
+            combined /= numpy.std(combined)
+            for d in range(8):
+                shift = d/8 * DF
+                om = make_osc_matrix(shift)
+                for l in range(0, 1024, 25):
 
-            # chop up the input samples into 162 256-long vectors, each corresponding to 1 symbol
-            im = make_input_matrix(downsampled, lag=l)
+                    # chop up the input samples into 162 256-long vectors, each corresponding to 1 symbol
+                    im = make_input_matrix(combined, lag=l)
 
-            # multiply by a matrix full of "oscillators" spaced 1.46Hz (one frequency shift bin apart). This is basically a discrete fourier transform...
-            ft = numpy.absolute(numpy.matmul(om, im.transpose()))
+                    # multiply by a matrix full of "oscillators" spaced 1.46Hz (one frequency shift bin apart).
+                    # This is basically a discrete fourier transform...
+                    ft = numpy.absolute(numpy.matmul(om, im.transpose()))
 
-            # compare each starting freq bin vs. the sync vector
-            z = numpy.matmul(sm,ft)
-            corr = numpy.matmul(z,sync_vec)
-
-            # save the best freq/delay for each bin
-            for item in enumerate(corr):
-                if item[0] not in bin_info or bin_info[item[0]]['sync'] < item[1]:
-                    bin_info[item[0]] = {
-                        'sync' : item[1],
-                        'lag' : l,
-                        'shift' : shift
-                    }
+                    # compare each starting freq bin vs. the sync vector
+                    z = numpy.matmul(sm,ft)
+                    corr = numpy.matmul(z,sync_vec)
+                    # save the best freq/delay for each bin
+                    for item in enumerate(corr):
+                        if item[0] not in bin_info or bin_info[item[0]]['sync'] < item[1]:
+                            bin_info[item[0]] = {
+                                'sync' : item[1],
+                                'lag' : l,
+                                'shift' : shift,
+                                'gain' : g,
+                                'phi' : phi
+                            }
 
     # look at top 20 bins
     s = sorted(bin_info.items(), reverse=True, key=lambda x:x[1]['sync'])
-    for (k,v) in s[:20]:
-        print('bin={} af={} rf={}: sync={}, lag={} ({:.2f}s), shift={}'.format(k, bin_to_af_freq(k), bin_to_rf_freq(k), v['sync'], v['lag'], v['lag']/375.0-1, v['shift']))
+    for (k,v) in s[:10]:
+        print('bin={} af={} rf={}: sync={}, lag={} ({:.2f}s), shift={}, gain={}, phi={}'.format(k, bin_to_af_freq(k), bin_to_rf_freq(k), v['sync'], v['lag'], v['lag']/375.0-1, v['shift'], v['gain'], v['phi']))
 
 if __name__ == '__main__':
     main()
