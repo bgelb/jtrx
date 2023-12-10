@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
-import numpy
-from scipy import signal
+import numpy as fft_np
+#import cupy as np
+import numpy as np
 
 sync_vec = [ 1,  1, -1, -1, -1, -1, -1, -1,  1, -1, -1, -1,  1,  1,  1, -1, -1,
        -1,  1, -1, -1,  1, -1,  1,  1,  1,  1, -1, -1, -1, -1, -1, -1, -1,
@@ -24,8 +25,8 @@ def argument_parser():
     return parser
 
 def osc(f, n):
-    dp = -1*2*numpy.pi*f*DT
-    return numpy.exp([1j*dp*i for i in range(n)])
+    dp = -1*2*np.pi*f*DT
+    return np.exp(np.array([1j*dp*i for i in range(n)]))
 
 def bin_to_baseband_freq(in_bin):
     assert in_bin >= 0 and in_bin < 128
@@ -38,15 +39,15 @@ def bin_to_rf_freq(in_bin):
     return 475700 + bin_to_baseband_freq(in_bin) + 1.5*DF
 
 def make_input_matrix(input_samples, lag=0):
-    in_vec = numpy.array(input_samples[lag:lag+162*256])
-    out_mat = numpy.reshape(in_vec, [162,256])
+    in_vec = np.array(input_samples[lag:lag+162*256])
+    out_mat = np.reshape(in_vec, [162,256])
     return out_mat
 
 def make_osc_matrix(shift=0):
-    return numpy.array([osc(bin_to_baseband_freq(i)+shift, 256) for i in range(128)])
+    return np.array([osc(bin_to_baseband_freq(i)+shift, 256) for i in range(128)])
 
 def make_sync_matrix():
-    return numpy.array([numpy.pad([-1,1,-1,1], (i,124-i)) for i in range(125)])
+    return np.array([np.pad(np.array([-1,1,-1,1]), (i,124-i)) for i in range(125)])
 
 def filter_decimate(input_samples):
     nfft1=1474560
@@ -55,14 +56,14 @@ def filter_decimate(input_samples):
     i0=int(1500.0/df+0.5);
 
 
-    spectrum = numpy.fft.fft(input_samples, n=nfft1)
+    spectrum = fft_np.fft.fft(input_samples, n=nfft1)
     filt_spectrum1 = spectrum[i0:i0+nfft2//2]
     filt_spectrum2 = spectrum[i0-nfft2//2:i0]
-    filt_spectrum = numpy.concatenate((filt_spectrum1, filt_spectrum2))
+    filt_spectrum = fft_np.concatenate((filt_spectrum1, filt_spectrum2))
 
     assert len(filt_spectrum) == nfft2
 
-    out = numpy.fft.ifft(filt_spectrum)
+    out = np.array(fft_np.fft.ifft(filt_spectrum))
     return out
 
 def demux(muxed):
@@ -72,14 +73,14 @@ def combine(channels, gain, phi):
     assert len(channels) == 2
     assert phi >= 0 and phi < 360.0
 
-    return channels[0] * 10**(gain/10) + channels[1] * 10**(-gain/10) * numpy.exp(1j*(phi/360.0)*2*numpy.pi)
+    return channels[0] * 10**(gain/10) + channels[1] * 10**(-gain/10) * np.exp(1j*(phi/360.0)*2*np.pi)
 
 def main():
     options = argument_parser().parse_args()
 
     f = open(options.infile, 'rb')
     buf = f.read()
-    in_items = numpy.frombuffer(buf, dtype=numpy.csingle, count=114*12000)
+    in_items = fft_np.frombuffer(buf, dtype=fft_np.csingle, count=114*12000)
 
     # channel 0 and 1 are from two different antennas, for now just use antenna 0
     channels = demux(in_items)
@@ -96,7 +97,7 @@ def main():
         for g in range(0, 9, 1):
             #combined = downsampled[0]
             combined = combine(downsampled, g, phi)
-            combined /= numpy.std(combined)
+            combined /= np.std(combined)
             for d in range(8):
                 shift = d/8 * DF
                 om = make_osc_matrix(shift)
@@ -107,11 +108,11 @@ def main():
 
                     # multiply by a matrix full of "oscillators" spaced 1.46Hz (one frequency shift bin apart).
                     # This is basically a discrete fourier transform...
-                    ft = numpy.absolute(numpy.matmul(om, im.transpose()))
+                    ft = np.absolute(np.matmul(om, im.transpose()))
 
                     # compare each starting freq bin vs. the sync vector
-                    z = numpy.matmul(sm,ft)
-                    corr = numpy.matmul(z,sync_vec)
+                    z = np.matmul(sm,ft)
+                    corr = np.matmul(z,np.array(sync_vec))
                     # save the best freq/delay for each bin
                     for item in enumerate(corr):
                         if item[0] not in bin_info or bin_info[item[0]]['sync'] < item[1]:
