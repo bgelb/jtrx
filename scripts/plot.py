@@ -33,7 +33,7 @@ def main():
 
 
     dtime = sorted(dtime)
-    fig, axs = plt.subplots(len(snr.keys()))
+    fig, axs = plt.subplots(len(snr.keys()), sharex=True, sharey=True)
     for (i, (tx,txsnr)) in enumerate(snr.items()):
         axs[i].set_title(tx)
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L1'] if t in snr[tx] and 'N1VF/L1' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Small Loop")
