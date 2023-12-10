@@ -4,6 +4,7 @@ WORKDIR=working
 DATADIR=data
 MYCALL=N1VF/L
 MYGRID=CM97AI
+OLD_PHASE_ARGS="--gain 0 --phi 0"
 
 export XDG_RUNTIME_DIR="/run/user/1000"
 
@@ -51,7 +52,7 @@ while [ 1 ] ; do
 		        fi
 		        echo "`date`: curl result: $RESULT , done." >> decode.log
 		fi
-		/usr/bin/jt9 -W -p 120 -L 1400 -H 1600 -f 1500 -F 100 -d 3 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
+		/usr/bin/jt9 -f 0.4742 -W -p 120 -L 1400 -H 1600 -f 1500 -F 100 -d 3 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
 		FILESIZE=$(stat -c%s "decoded.txt")
                 if [ $FILESIZE -ne 0 ] ; then
 
@@ -86,7 +87,8 @@ while [ 1 ] ; do
 		/usr/bin/wsprd -d -f 0.4742 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
 		FILESIZE=$(stat -c%s "wspr_spots.txt")
 		if [ $FILESIZE -ne 0 ] ; then
-
+			echo "`date`: saving phase args $PHASE_ARGS" >> decode.log
+			OLD_PHASE_ARGS=$PHASE_ARGS
 		        # add the spots to a temporary file used for uploading to wsprnet.org
 		        cat wspr_spots.txt >> wsprdsum_ch$i.out
 
