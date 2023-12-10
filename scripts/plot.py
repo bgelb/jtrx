@@ -20,9 +20,16 @@ def get_spots():
 
 def main():
     s = get_spots()
+
+    # filter singletons
+    filtered = {}
+    for (k,v) in s.items():
+        if len(v) > 1:
+            filtered[k] = v
+
     dtime = [] 
     snr = {}
-    for (tx,spots) in s.items():
+    for (tx,spots) in filtered.items():
         snr[tx] = {}
         for spot in spots:
             thetime = datetime.strptime(spot['time'], '%Y-%m-%d %H:%M:%S')
@@ -39,7 +46,9 @@ def main():
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L1'] if t in snr[tx] and 'N1VF/L1' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Small Loop")
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L2'] if t in snr[tx] and 'N1VF/L2' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Vertical")
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L3'] if t in snr[tx] and 'N1VF/L3' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Diversity")
+        axs[i].plot(dtime, [snr[tx][t]['N1VF/L3'] if t in snr[tx] and 'N1VF/L3' in snr[tx][t] and len(snr[tx][t].keys()) == 1 else numpy.nan for t in dtime], 'gx')
         axs[i].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        axs[i].grid(visible=True)
         axs[i].legend()
     fig.set_figwidth(17)
     fig.set_figheight(11)
