@@ -58,6 +58,7 @@ while [ 1 ] ; do
 
                         # add the spots to a temporary file used for uploading to wsprnet.org
                         cat decoded.txt | awk '{ print $1,$2,$3,$4,$5,$6,$7,$8,$9,0,3 }' >> wsprdsum_ch$i.out
+                        rm decoded.txt
 
                         # upload the spots
                         echo "`date`: upload fst4w by curl" >> decode.log
