@@ -6,7 +6,7 @@ from datetime import datetime
 import numpy
 
 def get_spots():
-    url = "http://db1.wspr.live/?query=select * from wspr.rx WHERE rx_sign LIKE 'N1VF/L%' AND time > (NOW() - INTERVAL 1 DAY) FORMAT JSON"
+    url = "http://db1.wspr.live/?query=select * from wspr.rx WHERE rx_sign LIKE 'N1VF/L%' AND code = '1' AND time > (NOW() - INTERVAL 1 DAY) FORMAT JSON"
     r = requests.get(url)
     data = r.json()['data']
 
