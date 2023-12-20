@@ -91,24 +91,26 @@ class two_rx_capture(gr.top_block):
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "")
         self.blocks_tag_debug_0.set_display(False)
         self.blocks_stream_mux_0 = blocks.stream_mux(gr.sizeof_gr_complex*1, (1, 1))
+        self.blocks_multiply_const_xx_1 = blocks.multiply_const_ff(64, 1)
         self.blocks_freqshift_cc_0_2 = blocks.rotator_cc(2.0*math.pi*(-f_if-bw/2)/samp_rate)
         self.blocks_freqshift_cc_0_1 = blocks.rotator_cc(2.0*math.pi*(-f_if-bw/2)/samp_rate)
         self.blocks_freqshift_cc_0_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
         self.blocks_freqshift_cc_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
-        self.blocks_float_to_short_0 = blocks.float_to_short(1, 64)
+        self.blocks_float_to_short_0 = blocks.float_to_short(1, 32768)
         self.blocks_complex_to_real_0_0 = blocks.complex_to_real(1)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_float_to_short_0, 0))
+        self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_multiply_const_xx_1, 0))
         self.connect((self.blocks_float_to_short_0, 0), (self.epy_block_2, 0))
         self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_stream_mux_0, 0))
         self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_complex_to_real_0_0, 0))
         self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_stream_mux_0, 1))
         self.connect((self.blocks_freqshift_cc_0_1, 0), (self.rational_resampler_xxx_0_0, 0))
         self.connect((self.blocks_freqshift_cc_0_2, 0), (self.rational_resampler_xxx_0, 0))
+        self.connect((self.blocks_multiply_const_xx_1, 0), (self.blocks_float_to_short_0, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.epy_block_1, 0))
         self.connect((self.epy_block_0, 0), (self.blocks_freqshift_cc_0_2, 0))

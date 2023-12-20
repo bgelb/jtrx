@@ -28,12 +28,12 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
         self.stream_name = stream_name
         self.framecounter = 0
         self.sr_const = [6000, 12000, 24000, 48000, 96000, 192000, 384000, 8000, 16000, 32000, 64000, 128000, 256000, 512000,11025, 22050, 44100, 88200, 176400, 352800, 705600]
+        self.to_ip = '192.168.2.255'
+        self.to_port = 6980
 
         # create a socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        #self.sock.bind(("0.0.0.0", 6980))
 
     def make_packet(self, samples, fcount):
         header  = b"VBAN" 
@@ -46,13 +46,12 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
         return header+samples.tobytes()
 
     def send_packet(self, packet):
-        self.sock.sendto(packet, ('192.168.2.255', 6980))
+        self.sock.sendto(packet, (self.to_ip, self.to_port))
 
     def work(self, input_items, output_items):
         """example: multiply with constant"""
-        max_samples_per_packet = 1436//2 # max 1436 bytes / 2 bytes per sample
-        frames = [np.array(input_items[i:i+max_samples_per_packet], dtype=np.short) for i in range(0, len(input_items[0]), max_samples_per_packet)] 
-
+        max_samples_per_packet = 255
+        frames = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]), max_samples_per_packet)]
         for f in frames:
             packet = self.make_packet(f, self.framecounter)
             self.send_packet(packet)
