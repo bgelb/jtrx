@@ -24,6 +24,7 @@ from gnuradio import eng_notation
 from gnuradio import sdrplay3
 import two_rx_capture_epy_block_0 as epy_block_0  # embedded python block
 import two_rx_capture_epy_block_1 as epy_block_1  # embedded python block
+import two_rx_capture_epy_block_2 as epy_block_2  # embedded python block
 
 
 
@@ -84,6 +85,7 @@ class two_rx_capture(gr.top_block):
                 decimation=decim,
                 taps=firdes.low_pass(1.0,samp_rate*interp,bw/2,100),
                 fractional_bw=0)
+        self.epy_block_2 = epy_block_2.blk(sample_rate=12000, stream_name='474.2khz')
         self.epy_block_1 = epy_block_1.blk(period_sec=60, debug=False)
         self.epy_block_0 = epy_block_0.blk(period=1)
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "")
@@ -93,12 +95,17 @@ class two_rx_capture(gr.top_block):
         self.blocks_freqshift_cc_0_1 = blocks.rotator_cc(2.0*math.pi*(-f_if-bw/2)/samp_rate)
         self.blocks_freqshift_cc_0_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
         self.blocks_freqshift_cc_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
+        self.blocks_float_to_short_0 = blocks.float_to_short(1, 64)
+        self.blocks_complex_to_real_0_0 = blocks.complex_to_real(1)
 
 
         ##################################################
         # Connections
         ##################################################
+        self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_float_to_short_0, 0))
+        self.connect((self.blocks_float_to_short_0, 0), (self.epy_block_2, 0))
         self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_stream_mux_0, 0))
+        self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_complex_to_real_0_0, 0))
         self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_stream_mux_0, 1))
         self.connect((self.blocks_freqshift_cc_0_1, 0), (self.rational_resampler_xxx_0_0, 0))
         self.connect((self.blocks_freqshift_cc_0_2, 0), (self.rational_resampler_xxx_0, 0))
