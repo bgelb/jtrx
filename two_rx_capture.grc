@@ -413,7 +413,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     sample_rate: '12000'
-    stream_name: '''474.2khz'''
+    stream_name: '''630m'''
   states:
     _io_cache: ('VBAN Audio Sink', 'blk', [('sample_rate', '12000'), ('stream_name',
       "'gnuradio'")], [('0', 'short', 1)], [], 'Embedded Python Block example - a

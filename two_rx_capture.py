@@ -85,7 +85,7 @@ class two_rx_capture(gr.top_block):
                 decimation=decim,
                 taps=firdes.low_pass(1.0,samp_rate*interp,bw/2,100),
                 fractional_bw=0)
-        self.epy_block_2 = epy_block_2.blk(sample_rate=12000, stream_name='474.2khz')
+        self.epy_block_2 = epy_block_2.blk(sample_rate=12000, stream_name='630m')
         self.epy_block_1 = epy_block_1.blk(period_sec=60, debug=False)
         self.epy_block_0 = epy_block_0.blk(period=1)
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "")
