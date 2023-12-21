@@ -52,7 +52,7 @@ while [ 1 ] ; do
 		        fi
 		        echo "`date`: curl result: $RESULT , done." >> decode.log
 		fi
-		/usr/bin/jt9 -f 0.4742 -W -p 120 -L 1400 -H 1600 -f 1500 -F 100 -d 3 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
+		/usr/bin/jt9 -W -p 120 -L 1400 -H 1600 -f 1500 -F 100 -d 3 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
 		FILESIZE=$(stat -c%s "decoded.txt")
                 if [ $FILESIZE -ne 0 ] ; then
 
