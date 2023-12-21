@@ -24,7 +24,7 @@ def main():
     # filter singletons
     filtered = {}
     for (k,v) in s.items():
-        if len(v) > 1:
+        if len(v) > 1 and k != 'N1VF':
             filtered[k] = v
 
     dtime = [] 
@@ -46,7 +46,7 @@ def main():
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L1'] if t in snr[tx] and 'N1VF/L1' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Small Loop")
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L2'] if t in snr[tx] and 'N1VF/L2' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Vertical")
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L3'] if t in snr[tx] and 'N1VF/L3' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Diversity")
-        axs[i].plot(dtime, [snr[tx][t]['N1VF/L3'] if t in snr[tx] and 'N1VF/L3' in snr[tx][t] and len(snr[tx][t].keys()) == 1 else numpy.nan for t in dtime], 'gx')
+        axs[i].plot(dtime, [snr[tx][t]['N1VF/L3'] if t in snr[tx] and 'N1VF/L3' in snr[tx][t] and len(snr[tx][t].keys()) == 1 else numpy.nan for t in dtime], 'gx', label='Diversity Bonus Spot')
         axs[i].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
         axs[i].grid(visible=True)
         axs[i].legend()
