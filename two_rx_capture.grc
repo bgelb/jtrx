@@ -472,7 +472,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [416, 140.0]
+    coordinate: [288, 164.0]
     rotation: 0
     state: true
 - name: epy_block_1
@@ -821,6 +821,20 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [24, 228.0]
+    rotation: 0
+    state: true
+- name: xmlrpc_server_0
+  id: xmlrpc_server
+  parameters:
+    addr: localhost
+    alias: ''
+    comment: ''
+    port: '8080'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [440, 552.0]
     rotation: 0
     state: true
 

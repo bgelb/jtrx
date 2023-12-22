@@ -22,6 +22,8 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import sdrplay3
+from xmlrpc.server import SimpleXMLRPCServer
+import threading
 import two_rx_capture_epy_block_0 as epy_block_0  # embedded python block
 import two_rx_capture_epy_block_1 as epy_block_1  # embedded python block
 import two_rx_capture_epy_block_2 as epy_block_2  # embedded python block
@@ -56,6 +58,11 @@ class two_rx_capture(gr.top_block):
         # Blocks
         ##################################################
 
+        self.xmlrpc_server_0 = SimpleXMLRPCServer(('localhost', 8080), allow_none=True)
+        self.xmlrpc_server_0.register_instance(self)
+        self.xmlrpc_server_0_thread = threading.Thread(target=self.xmlrpc_server_0.serve_forever)
+        self.xmlrpc_server_0_thread.daemon = True
+        self.xmlrpc_server_0_thread.start()
         self.sdrplay3_rspduo_0 = sdrplay3.rspduo(
             '',
             rspduo_mode="Dual Tuner (diversity reception)",
