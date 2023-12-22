@@ -32,6 +32,7 @@ while [ 1 ] ; do
 	do
 		echo "`date`: Processing Channel $i" >> decode.log
 		/usr/bin/wsprd -d -f 0.4742 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
+		sed -i '/N1VF/ d' wspr_spots.txt
 		FILESIZE=$(stat -c%s "wspr_spots.txt")
 		if [ $FILESIZE -ne 0 ] ; then
 
@@ -86,6 +87,7 @@ while [ 1 ] ; do
 	do
 		echo "`date`: Processing Channel $i" >> decode.log
 		/usr/bin/wsprd -d -f 0.4742 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
+		sed -i '/N1VF/ d' wspr_spots.txt
 		FILESIZE=$(stat -c%s "wspr_spots.txt")
 		if [ $FILESIZE -ne 0 ] ; then
 			echo "`date`: saving phase args $PHASE_ARGS" >> decode.log
