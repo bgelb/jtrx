@@ -51,7 +51,7 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
     def work(self, input_items, output_items):
         """example: multiply with constant"""
         max_samples_per_packet = 255
-        frames = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]), max_samples_per_packet)]
+        frames = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]), max_samples_per_packet)] 
         for f in frames:
             packet = self.make_packet(f, self.framecounter)
             self.send_packet(packet)

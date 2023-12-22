@@ -105,6 +105,40 @@ blocks:
     coordinate: [184, 12]
     rotation: 0
     state: enabled
+- name: blocks_add_xx_0
+  id: blocks_add_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1136, 688.0]
+    rotation: 0
+    state: true
+- name: blocks_complex_to_real_0
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1472, 672.0]
+    rotation: 0
+    state: true
 - name: blocks_complex_to_real_0_0
   id: blocks_complex_to_real
   parameters:
@@ -118,7 +152,23 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1144, 432.0]
+    coordinate: [1184, 440.0]
+    rotation: 0
+    state: true
+- name: blocks_complex_to_real_0_0_0
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1296, 24.0]
     rotation: 0
     state: true
 - name: blocks_float_to_short_0
@@ -135,7 +185,41 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1152, 580.0]
+    coordinate: [1192, 588.0]
+    rotation: 0
+    state: true
+- name: blocks_float_to_short_0_0
+  id: blocks_float_to_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '32768'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1304, 156.0]
+    rotation: 0
+    state: true
+- name: blocks_float_to_short_0_1
+  id: blocks_float_to_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '32768'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1488, 836.0]
     rotation: 0
     state: true
 - name: blocks_freqshift_cc_0
@@ -206,6 +290,24 @@ blocks:
     coordinate: [632, 124.0]
     rotation: 0
     state: true
+- name: blocks_multiply_const_xx_0
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '64'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1480, 756.0]
+    rotation: 0
+    state: true
 - name: blocks_multiply_const_xx_1
   id: blocks_multiply_const_xx
   parameters:
@@ -221,7 +323,78 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1128, 500.0]
+    coordinate: [1168, 508.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_xx_1_0
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '64'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1304, 92.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_xx_1_1
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: 10**(gain/10)
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [856, 628.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_xx_2
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: 10**(-gain/10)
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [856, 756.0]
+    rotation: 0
+    state: true
+- name: blocks_phase_shift_0
+  id: blocks_phase_shift
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    is_radians: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    shift: phi
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [648, 752.0]
     rotation: 0
     state: true
 - name: blocks_stream_mux_0
@@ -413,7 +586,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     sample_rate: '12000'
-    stream_name: '''630m'''
+    stream_name: '''630m-2'''
   states:
     _io_cache: ('VBAN Audio Sink', 'blk', [('sample_rate', '12000'), ('stream_name',
       "'gnuradio'")], [('0', 'short', 1)], [], 'Embedded Python Block example - a
@@ -422,6 +595,146 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1368, 588.0]
+    rotation: 0
+    state: true
+- name: epy_block_2_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\nimport socket\nimport struct\n\nclass blk(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
+      \ sample_rate=12000, stream_name='gnuradio'):  # only default arguments here\n\
+      \        \"\"\"arguments to this function show up as parameters in GRC\"\"\"\
+      \n        gr.sync_block.__init__(\n            self,\n            name='VBAN\
+      \ Audio Sink',   # will show up in GRC\n            in_sig=[np.short],\n   \
+      \         out_sig=None\n        )\n        # if an attribute with the same name\
+      \ as a parameter is found,\n        # a callback is registered (properties work,\
+      \ too).\n        self.sample_rate = sample_rate\n        self.stream_name =\
+      \ stream_name\n        self.framecounter = 0\n        self.sr_const = [6000,\
+      \ 12000, 24000, 48000, 96000, 192000, 384000, 8000, 16000, 32000, 64000, 128000,\
+      \ 256000, 512000,11025, 22050, 44100, 88200, 176400, 352800, 705600]\n     \
+      \   self.to_ip = '192.168.2.255'\n        self.to_port = 6980\n\n        # create\
+      \ a socket\n        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\
+      \ # UDP\n        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST,\
+      \ 1)\n\n    def make_packet(self, samples, fcount):\n        header  = b\"VBAN\"\
+      \ \n        header += bytes([self.sr_const.index(self.sample_rate)])\n     \
+      \   header += bytes([len(samples)-1])\n        header += bytes([0]) # mono 1\
+      \ channel\n        header += b'\\x01'  #VBAN_CODEC_PCM\n        header += bytes(self.stream_name\
+      \ + \"\\x00\" * (16 - len(self.stream_name)), 'utf-8')\n        header += struct.pack(\"\
+      <L\",fcount)\n        return header+samples.tobytes()\n\n    def send_packet(self,\
+      \ packet):\n        self.sock.sendto(packet, (self.to_ip, self.to_port))\n\n\
+      \    def work(self, input_items, output_items):\n        \"\"\"example: multiply\
+      \ with constant\"\"\"\n        max_samples_per_packet = 255\n        frames\
+      \ = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]),\
+      \ max_samples_per_packet)] \n        for f in frames:\n            packet =\
+      \ self.make_packet(f, self.framecounter)\n            self.send_packet(packet)\n\
+      \            self.framecounter += 1\n\n\n        return len(input_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: '12000'
+    stream_name: '''630m-1'''
+  states:
+    _io_cache: ('VBAN Audio Sink', 'blk', [('sample_rate', '12000'), ('stream_name',
+      "'gnuradio'")], [('0', 'short', 1)], [], 'Embedded Python Block example - a
+      simple multiply const', ['sample_rate', 'stream_name'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1552, 36.0]
+    rotation: 0
+    state: true
+- name: epy_block_2_1
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\nimport socket\nimport struct\n\nclass blk(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
+      \ sample_rate=12000, stream_name='gnuradio'):  # only default arguments here\n\
+      \        \"\"\"arguments to this function show up as parameters in GRC\"\"\"\
+      \n        gr.sync_block.__init__(\n            self,\n            name='VBAN\
+      \ Audio Sink',   # will show up in GRC\n            in_sig=[np.short],\n   \
+      \         out_sig=None\n        )\n        # if an attribute with the same name\
+      \ as a parameter is found,\n        # a callback is registered (properties work,\
+      \ too).\n        self.sample_rate = sample_rate\n        self.stream_name =\
+      \ stream_name\n        self.framecounter = 0\n        self.sr_const = [6000,\
+      \ 12000, 24000, 48000, 96000, 192000, 384000, 8000, 16000, 32000, 64000, 128000,\
+      \ 256000, 512000,11025, 22050, 44100, 88200, 176400, 352800, 705600]\n     \
+      \   self.to_ip = '192.168.2.255'\n        self.to_port = 6980\n\n        # create\
+      \ a socket\n        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\
+      \ # UDP\n        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST,\
+      \ 1)\n\n    def make_packet(self, samples, fcount):\n        header  = b\"VBAN\"\
+      \ \n        header += bytes([self.sr_const.index(self.sample_rate)])\n     \
+      \   header += bytes([len(samples)-1])\n        header += bytes([0]) # mono 1\
+      \ channel\n        header += b'\\x01'  #VBAN_CODEC_PCM\n        header += bytes(self.stream_name\
+      \ + \"\\x00\" * (16 - len(self.stream_name)), 'utf-8')\n        header += struct.pack(\"\
+      <L\",fcount)\n        return header+samples.tobytes()\n\n    def send_packet(self,\
+      \ packet):\n        self.sock.sendto(packet, (self.to_ip, self.to_port))\n\n\
+      \    def work(self, input_items, output_items):\n        \"\"\"example: multiply\
+      \ with constant\"\"\"\n        max_samples_per_packet = 255\n        frames\
+      \ = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]),\
+      \ max_samples_per_packet)] \n        for f in frames:\n            packet =\
+      \ self.make_packet(f, self.framecounter)\n            self.send_packet(packet)\n\
+      \            self.framecounter += 1\n\n\n        return len(input_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: '12000'
+    stream_name: '''630m-3'''
+  states:
+    _io_cache: ('VBAN Audio Sink', 'blk', [('sample_rate', '12000'), ('stream_name',
+      "'gnuradio'")], [('0', 'short', 1)], [], 'Embedded Python Block example - a
+      simple multiply const', ['sample_rate', 'stream_name'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1488, 908.0]
+    rotation: 0
+    state: true
+- name: gain
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: ''
+    short_id: ''
+    type: eng_float
+    value: '5'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [640, 12.0]
+    rotation: 0
+    state: true
+- name: phi
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: ''
+    short_id: ''
+    type: eng_float
+    value: '30'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [744, 12.0]
     rotation: 0
     state: true
 - name: rational_resampler_xxx_0
@@ -512,14 +825,27 @@ blocks:
     state: true
 
 connections:
+- [blocks_add_xx_0, '0', blocks_complex_to_real_0, '0']
+- [blocks_complex_to_real_0, '0', blocks_multiply_const_xx_0, '0']
 - [blocks_complex_to_real_0_0, '0', blocks_multiply_const_xx_1, '0']
+- [blocks_complex_to_real_0_0_0, '0', blocks_multiply_const_xx_1_0, '0']
 - [blocks_float_to_short_0, '0', epy_block_2, '0']
+- [blocks_float_to_short_0_0, '0', epy_block_2_0, '0']
+- [blocks_float_to_short_0_1, '0', epy_block_2_1, '0']
+- [blocks_freqshift_cc_0, '0', blocks_complex_to_real_0_0_0, '0']
+- [blocks_freqshift_cc_0, '0', blocks_multiply_const_xx_1_1, '0']
 - [blocks_freqshift_cc_0, '0', blocks_stream_mux_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_complex_to_real_0_0, '0']
+- [blocks_freqshift_cc_0_0, '0', blocks_phase_shift_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_stream_mux_0, '1']
 - [blocks_freqshift_cc_0_1, '0', rational_resampler_xxx_0_0, '0']
 - [blocks_freqshift_cc_0_2, '0', rational_resampler_xxx_0, '0']
+- [blocks_multiply_const_xx_0, '0', blocks_float_to_short_0_1, '0']
 - [blocks_multiply_const_xx_1, '0', blocks_float_to_short_0, '0']
+- [blocks_multiply_const_xx_1_0, '0', blocks_float_to_short_0_0, '0']
+- [blocks_multiply_const_xx_1_1, '0', blocks_add_xx_0, '0']
+- [blocks_multiply_const_xx_2, '0', blocks_add_xx_0, '1']
+- [blocks_phase_shift_0, '0', blocks_multiply_const_xx_2, '0']
 - [blocks_stream_mux_0, '0', blocks_tag_debug_0, '0']
 - [blocks_stream_mux_0, '0', epy_block_1, '0']
 - [epy_block_0, '0', blocks_freqshift_cc_0_2, '0']

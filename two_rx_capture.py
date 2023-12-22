@@ -25,14 +25,22 @@ from gnuradio import sdrplay3
 import two_rx_capture_epy_block_0 as epy_block_0  # embedded python block
 import two_rx_capture_epy_block_1 as epy_block_1  # embedded python block
 import two_rx_capture_epy_block_2 as epy_block_2  # embedded python block
+import two_rx_capture_epy_block_2_0 as epy_block_2_0  # embedded python block
+import two_rx_capture_epy_block_2_1 as epy_block_2_1  # embedded python block
 
 
 
 
 class two_rx_capture(gr.top_block):
 
-    def __init__(self):
+    def __init__(self, gain=5, phi=30):
         gr.top_block.__init__(self, "Two RX Capture Graph", catch_exceptions=True)
+
+        ##################################################
+        # Parameters
+        ##################################################
+        self.gain = gain
+        self.phi = phi
 
         ##################################################
         # Variables
@@ -85,32 +93,57 @@ class two_rx_capture(gr.top_block):
                 decimation=decim,
                 taps=firdes.low_pass(1.0,samp_rate*interp,bw/2,100),
                 fractional_bw=0)
-        self.epy_block_2 = epy_block_2.blk(sample_rate=12000, stream_name='630m')
+        self.epy_block_2_1 = epy_block_2_1.blk(sample_rate=12000, stream_name='630m-3')
+        self.epy_block_2_0 = epy_block_2_0.blk(sample_rate=12000, stream_name='630m-1')
+        self.epy_block_2 = epy_block_2.blk(sample_rate=12000, stream_name='630m-2')
         self.epy_block_1 = epy_block_1.blk(period_sec=60, debug=False)
         self.epy_block_0 = epy_block_0.blk(period=1)
         self.blocks_tag_debug_0 = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "")
         self.blocks_tag_debug_0.set_display(False)
         self.blocks_stream_mux_0 = blocks.stream_mux(gr.sizeof_gr_complex*1, (1, 1))
+        self.blocks_phase_shift_0 = blocks.phase_shift(phi, False)
+        self.blocks_multiply_const_xx_2 = blocks.multiply_const_cc(10**(-gain/10), 1)
+        self.blocks_multiply_const_xx_1_1 = blocks.multiply_const_cc(10**(gain/10), 1)
+        self.blocks_multiply_const_xx_1_0 = blocks.multiply_const_ff(64, 1)
         self.blocks_multiply_const_xx_1 = blocks.multiply_const_ff(64, 1)
+        self.blocks_multiply_const_xx_0 = blocks.multiply_const_ff(64, 1)
         self.blocks_freqshift_cc_0_2 = blocks.rotator_cc(2.0*math.pi*(-f_if-bw/2)/samp_rate)
         self.blocks_freqshift_cc_0_1 = blocks.rotator_cc(2.0*math.pi*(-f_if-bw/2)/samp_rate)
         self.blocks_freqshift_cc_0_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
         self.blocks_freqshift_cc_0 = blocks.rotator_cc(2.0*math.pi*(bw/2)/(samp_rate*interp/decim))
+        self.blocks_float_to_short_0_1 = blocks.float_to_short(1, 32768)
+        self.blocks_float_to_short_0_0 = blocks.float_to_short(1, 32768)
         self.blocks_float_to_short_0 = blocks.float_to_short(1, 32768)
+        self.blocks_complex_to_real_0_0_0 = blocks.complex_to_real(1)
         self.blocks_complex_to_real_0_0 = blocks.complex_to_real(1)
+        self.blocks_complex_to_real_0 = blocks.complex_to_real(1)
+        self.blocks_add_xx_0 = blocks.add_vcc(1)
 
 
         ##################################################
         # Connections
         ##################################################
+        self.connect((self.blocks_add_xx_0, 0), (self.blocks_complex_to_real_0, 0))
+        self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_multiply_const_xx_0, 0))
         self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_multiply_const_xx_1, 0))
+        self.connect((self.blocks_complex_to_real_0_0_0, 0), (self.blocks_multiply_const_xx_1_0, 0))
         self.connect((self.blocks_float_to_short_0, 0), (self.epy_block_2, 0))
+        self.connect((self.blocks_float_to_short_0_0, 0), (self.epy_block_2_0, 0))
+        self.connect((self.blocks_float_to_short_0_1, 0), (self.epy_block_2_1, 0))
+        self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_complex_to_real_0_0_0, 0))
+        self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_multiply_const_xx_1_1, 0))
         self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_stream_mux_0, 0))
         self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_complex_to_real_0_0, 0))
+        self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_phase_shift_0, 0))
         self.connect((self.blocks_freqshift_cc_0_0, 0), (self.blocks_stream_mux_0, 1))
         self.connect((self.blocks_freqshift_cc_0_1, 0), (self.rational_resampler_xxx_0_0, 0))
         self.connect((self.blocks_freqshift_cc_0_2, 0), (self.rational_resampler_xxx_0, 0))
+        self.connect((self.blocks_multiply_const_xx_0, 0), (self.blocks_float_to_short_0_1, 0))
         self.connect((self.blocks_multiply_const_xx_1, 0), (self.blocks_float_to_short_0, 0))
+        self.connect((self.blocks_multiply_const_xx_1_0, 0), (self.blocks_float_to_short_0_0, 0))
+        self.connect((self.blocks_multiply_const_xx_1_1, 0), (self.blocks_add_xx_0, 0))
+        self.connect((self.blocks_multiply_const_xx_2, 0), (self.blocks_add_xx_0, 1))
+        self.connect((self.blocks_phase_shift_0, 0), (self.blocks_multiply_const_xx_2, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.blocks_tag_debug_0, 0))
         self.connect((self.blocks_stream_mux_0, 0), (self.epy_block_1, 0))
         self.connect((self.epy_block_0, 0), (self.blocks_freqshift_cc_0_2, 0))
@@ -119,6 +152,21 @@ class two_rx_capture(gr.top_block):
         self.connect((self.sdrplay3_rspduo_0, 1), (self.blocks_freqshift_cc_0_1, 0))
         self.connect((self.sdrplay3_rspduo_0, 0), (self.epy_block_0, 0))
 
+
+    def get_gain(self):
+        return self.gain
+
+    def set_gain(self, gain):
+        self.gain = gain
+        self.blocks_multiply_const_xx_1_1.set_k(10**(self.gain/10))
+        self.blocks_multiply_const_xx_2.set_k(10**(-self.gain/10))
+
+    def get_phi(self):
+        return self.phi
+
+    def set_phi(self, phi):
+        self.phi = phi
+        self.blocks_phase_shift_0.set_shift(self.phi)
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -181,9 +229,22 @@ class two_rx_capture(gr.top_block):
 
 
 
+def argument_parser():
+    description = 'Capture two streams of samples from sdrDUO'
+    parser = ArgumentParser(description=description)
+    parser.add_argument(
+        "--gain", dest="gain", type=eng_float, default=eng_notation.num_to_str(float(5)),
+        help="Set gain [default=%(default)r]")
+    parser.add_argument(
+        "--phi", dest="phi", type=eng_float, default=eng_notation.num_to_str(float(30)),
+        help="Set phi [default=%(default)r]")
+    return parser
+
 
 def main(top_block_cls=two_rx_capture, options=None):
-    tb = top_block_cls()
+    if options is None:
+        options = argument_parser().parse_args()
+    tb = top_block_cls(gain=options.gain, phi=options.phi)
 
     def sig_handler(sig=None, frame=None):
         tb.stop()
