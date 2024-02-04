@@ -40,6 +40,7 @@ while [ 1 ] ; do
 		        cat wspr_spots.txt >> wsprdsum_ch$i.out
 
 		        # upload the spots
+			cat wsprdsum_ch$i.out
 		        echo "`date`: upload wspr by curl" >> decode.log
 		        /usr/bin/curl -m 10 -F allmept=@wsprdsum_ch$i.out -F call=${MYCALL}${i} -F grid=${MYGRID} http://wsprnet.org/meptspots.php >> decode.log;
 		        RESULT=$?
@@ -63,6 +64,7 @@ while [ 1 ] ; do
                         rm decoded.txt
 
                         # upload the spots
+			cat wsprdsum_ch$i.out
                         echo "`date`: upload fst4w by curl" >> decode.log
                         /usr/bin/curl -m 10 -F allmept=@wsprdsum_ch$i.out -F call=${MYCALL}${i} -F grid=${MYGRID} http://wsprnet.org/meptspots.php >> decode.log;
                         RESULT=$?
