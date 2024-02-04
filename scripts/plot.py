@@ -45,8 +45,8 @@ def main():
         axs = [axs]
     for (i, (tx,txsnr)) in enumerate(snr.items()):
         axs[i].set_title(tx)
-        axs[i].plot(dtime, [snr[tx][t]['N1VF/L1'] if t in snr[tx] and 'N1VF/L1' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Small Loop")
-        axs[i].plot(dtime, [snr[tx][t]['N1VF/L2'] if t in snr[tx] and 'N1VF/L2' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Vertical")
+        axs[i].plot(dtime, [snr[tx][t]['N1VF/L1'] if t in snr[tx] and 'N1VF/L1' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Active Vertical")
+        axs[i].plot(dtime, [snr[tx][t]['N1VF/L2'] if t in snr[tx] and 'N1VF/L2' in snr[tx][t] else numpy.nan for t in dtime], '+', label="TX Vertical")
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L3'] if t in snr[tx] and 'N1VF/L3' in snr[tx][t] else numpy.nan for t in dtime], '+', label="Diversity")
         axs[i].plot(dtime, [snr[tx][t]['N1VF/L3'] if t in snr[tx] and 'N1VF/L3' in snr[tx][t] and len(snr[tx][t].keys()) == 1 else numpy.nan for t in dtime], 'gx', label='Diversity Bonus Spot')
         axs[i].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
