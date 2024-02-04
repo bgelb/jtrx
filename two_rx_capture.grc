@@ -97,7 +97,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: 62.5e3
+    value: 2e6
   states:
     bus_sink: false
     bus_source: false
@@ -231,7 +231,7 @@ blocks:
     freq: bw/2
     maxoutbuf: '0'
     minoutbuf: '0'
-    sample_rate: samp_rate*interp/decim
+    sample_rate: 12e3
   states:
     bus_sink: false
     bus_source: false
@@ -248,46 +248,12 @@ blocks:
     freq: bw/2
     maxoutbuf: '0'
     minoutbuf: '0'
-    sample_rate: samp_rate*interp/decim
+    sample_rate: 12e3
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [1064, 332.0]
-    rotation: 0
-    state: true
-- name: blocks_freqshift_cc_0_1
-  id: blocks_freqshift_cc
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    freq: -f_if-bw/2
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    sample_rate: samp_rate
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [592, 308.0]
-    rotation: 0
-    state: true
-- name: blocks_freqshift_cc_0_2
-  id: blocks_freqshift_cc
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    freq: -f_if-bw/2
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    sample_rate: samp_rate
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [632, 124.0]
     rotation: 0
     state: true
 - name: blocks_multiply_const_xx_0
@@ -703,6 +669,46 @@ blocks:
     coordinate: [1488, 908.0]
     rotation: 0
     state: true
+- name: freq_xlating_fir_filter_xxx_1
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    center_freq: -f_if-bw/2
+    comment: ''
+    decim: '125'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    taps: firdes.low_pass(1.0,samp_rate,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [528, 316.0]
+    rotation: 0
+    state: true
+- name: freq_xlating_fir_filter_xxx_1_0
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    center_freq: -f_if-bw/2
+    comment: ''
+    decim: '125'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    taps: firdes.low_pass(1.0,samp_rate,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [552, 132.0]
+    rotation: 0
+    state: true
 - name: gain
   id: parameter
   parameters:
@@ -737,44 +743,44 @@ blocks:
     coordinate: [744, 12.0]
     rotation: 0
     state: true
-- name: rational_resampler_xxx_0
-  id: rational_resampler_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    decim: decim
-    fbw: '0'
-    interp: interp
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    taps: firdes.low_pass(1.0,samp_rate*interp,bw/2,100)
-    type: ccc
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [848, 92.0]
-    rotation: 0
-    state: true
 - name: rational_resampler_xxx_0_0
   id: rational_resampler_xxx
   parameters:
     affinity: ''
     alias: ''
     comment: ''
-    decim: decim
+    decim: '4'
     fbw: '0'
-    interp: interp
+    interp: '3'
     maxoutbuf: '0'
     minoutbuf: '0'
-    taps: firdes.low_pass(1.0,samp_rate*interp,bw/2,100)
+    taps: firdes.low_pass(1.0,16e3*3,bw/2,100)
     type: ccc
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [824, 316.0]
+    rotation: 0
+    state: true
+- name: rational_resampler_xxx_0_0_0
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '4'
+    fbw: '0'
+    interp: '3'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(1.0,16e3*3,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [824, 124.0]
     rotation: 0
     state: true
 - name: sdrplay3_rspduo_0
@@ -800,8 +806,8 @@ blocks:
     debug_mode: 'True'
     freq_corr: '0'
     if_gRdB: '40'
-    if_gRdB0: '35'
-    if_gRdB1: '35'
+    if_gRdB0: '59'
+    if_gRdB1: '59'
     iq_balance_mode: 'False'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -852,8 +858,6 @@ connections:
 - [blocks_freqshift_cc_0_0, '0', blocks_complex_to_real_0_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_phase_shift_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_stream_mux_0, '1']
-- [blocks_freqshift_cc_0_1, '0', rational_resampler_xxx_0_0, '0']
-- [blocks_freqshift_cc_0_2, '0', rational_resampler_xxx_0, '0']
 - [blocks_multiply_const_xx_0, '0', blocks_float_to_short_0_1, '0']
 - [blocks_multiply_const_xx_1, '0', blocks_float_to_short_0, '0']
 - [blocks_multiply_const_xx_1_0, '0', blocks_float_to_short_0_0, '0']
@@ -862,11 +866,13 @@ connections:
 - [blocks_phase_shift_0, '0', blocks_multiply_const_xx_2, '0']
 - [blocks_stream_mux_0, '0', blocks_tag_debug_0, '0']
 - [blocks_stream_mux_0, '0', epy_block_1, '0']
-- [epy_block_0, '0', blocks_freqshift_cc_0_2, '0']
-- [rational_resampler_xxx_0, '0', blocks_freqshift_cc_0, '0']
+- [epy_block_0, '0', freq_xlating_fir_filter_xxx_1_0, '0']
+- [freq_xlating_fir_filter_xxx_1, '0', rational_resampler_xxx_0_0, '0']
+- [freq_xlating_fir_filter_xxx_1_0, '0', rational_resampler_xxx_0_0_0, '0']
 - [rational_resampler_xxx_0_0, '0', blocks_freqshift_cc_0_0, '0']
+- [rational_resampler_xxx_0_0_0, '0', blocks_freqshift_cc_0, '0']
 - [sdrplay3_rspduo_0, '0', epy_block_0, '0']
-- [sdrplay3_rspduo_0, '1', blocks_freqshift_cc_0_1, '0']
+- [sdrplay3_rspduo_0, '1', freq_xlating_fir_filter_xxx_1, '0']
 
 metadata:
   file_format: 1
