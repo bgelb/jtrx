@@ -674,7 +674,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    center_freq: -f_if-bw/2
+    center_freq: f_if+bw/2
     comment: ''
     decim: '125'
     maxoutbuf: '0'
@@ -694,7 +694,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    center_freq: -f_if-bw/2
+    center_freq: f_if+bw/2
     comment: ''
     decim: '125'
     maxoutbuf: '0'
@@ -706,7 +706,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [552, 132.0]
+    coordinate: [552, 140.0]
     rotation: 0
     state: true
 - name: gain

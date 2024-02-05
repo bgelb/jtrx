@@ -100,8 +100,8 @@ class two_rx_capture(gr.top_block):
                 decimation=4,
                 taps=firdes.low_pass(1.0,16e3*3,bw/2,100),
                 fractional_bw=0)
-        self.freq_xlating_fir_filter_xxx_1_0 = filter.freq_xlating_fir_filter_ccc(125, firdes.low_pass(1.0,samp_rate,bw/2,100), (-f_if-bw/2), samp_rate)
-        self.freq_xlating_fir_filter_xxx_1 = filter.freq_xlating_fir_filter_ccc(125, firdes.low_pass(1.0,samp_rate,bw/2,100), (-f_if-bw/2), samp_rate)
+        self.freq_xlating_fir_filter_xxx_1_0 = filter.freq_xlating_fir_filter_ccc(125, firdes.low_pass(1.0,samp_rate,bw/2,100), (f_if+bw/2), samp_rate)
+        self.freq_xlating_fir_filter_xxx_1 = filter.freq_xlating_fir_filter_ccc(125, firdes.low_pass(1.0,samp_rate,bw/2,100), (f_if+bw/2), samp_rate)
         self.epy_block_2_1 = epy_block_2_1.blk(sample_rate=12000, stream_name='630m-3')
         self.epy_block_2_0 = epy_block_2_0.blk(sample_rate=12000, stream_name='630m-1')
         self.epy_block_2 = epy_block_2.blk(sample_rate=12000, stream_name='630m-2')
@@ -202,8 +202,8 @@ class two_rx_capture(gr.top_block):
 
     def set_f_if(self, f_if):
         self.f_if = f_if
-        self.freq_xlating_fir_filter_xxx_1.set_center_freq((-self.f_if-self.bw/2))
-        self.freq_xlating_fir_filter_xxx_1_0.set_center_freq((-self.f_if-self.bw/2))
+        self.freq_xlating_fir_filter_xxx_1.set_center_freq((self.f_if+self.bw/2))
+        self.freq_xlating_fir_filter_xxx_1_0.set_center_freq((self.f_if+self.bw/2))
         self.sdrplay3_rspduo_0.set_center_freq((self.fc-self.f_if))
 
     def get_decim(self):
@@ -220,9 +220,9 @@ class two_rx_capture(gr.top_block):
         self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*(self.bw/2)/12e3)
         self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*(self.bw/2)/12e3)
         self.freq_xlating_fir_filter_xxx_1.set_taps(firdes.low_pass(1.0,self.samp_rate,self.bw/2,100))
-        self.freq_xlating_fir_filter_xxx_1.set_center_freq((-self.f_if-self.bw/2))
+        self.freq_xlating_fir_filter_xxx_1.set_center_freq((self.f_if+self.bw/2))
         self.freq_xlating_fir_filter_xxx_1_0.set_taps(firdes.low_pass(1.0,self.samp_rate,self.bw/2,100))
-        self.freq_xlating_fir_filter_xxx_1_0.set_center_freq((-self.f_if-self.bw/2))
+        self.freq_xlating_fir_filter_xxx_1_0.set_center_freq((self.f_if+self.bw/2))
         self.rational_resampler_xxx_0_0.set_taps(firdes.low_pass(1.0,16e3*3,self.bw/2,100))
         self.rational_resampler_xxx_0_0_0.set_taps(firdes.low_pass(1.0,16e3*3,self.bw/2,100))
 
