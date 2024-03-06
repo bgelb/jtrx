@@ -61,7 +61,8 @@ while [ 1 ] ; do
                         cat decoded.txt >> decode.log
                         # add the spots to a temporary file used for uploading to wsprnet.org
                         #cat decoded.txt | awk '{ print $1,$2,$3,$4,$5,$6,$7,$8,$9,0,3 }' >> wsprdsum_ch$i.out
-                        cat decoded.txt | awk -v ts="${PERIOD_PREV_2}" '{ rf = ($5+474200) / 1000000 ; print ts,$2,$3,$4,rf,$7,$8,$9,0,3 }' >> wsprdsum_ch$i.out
+                        TS_FIXED=`echo ${PERIOD_PREV_2} | sed 's/_/ /'`
+                        cat decoded.txt | awk -v ts="${TS_FIXED}" '{ rf = ($5+474200) / 1000000 ; print ts,$2,$3,$4,rf,$7,$8,$9,0,3 }' >> wsprdsum_ch$i.out
                         rm decoded.txt
 
                         # upload the spots
