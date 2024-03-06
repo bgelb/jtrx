@@ -57,14 +57,15 @@ while [ 1 ] ; do
 		/usr/bin/jt9 -W -p 120 -L 1400 -H 1600 -f 1500 -F 100 -d 3 ch${i}_${PERIOD_PREV_2}.wav >> decode.log
 		FILESIZE=$(stat -c%s "decoded.txt")
                 if [ $FILESIZE -ne 0 ] ; then
-
+                        echo "nonzero decoded.txt" >> decode.log
+                        cat decoded.txt >> decode.log
                         # add the spots to a temporary file used for uploading to wsprnet.org
                         #cat decoded.txt | awk '{ print $1,$2,$3,$4,$5,$6,$7,$8,$9,0,3 }' >> wsprdsum_ch$i.out
-                        cat decoded.txt | awk -v ts="${PERIOD_PREV_2}" '{ rf = ($5+474200) / 1000000 ; print ts,$2,$3,$4,rf,$6,$7,$8,$9,0,3 }' >> wsprdsum_ch$i.out
+                        cat decoded.txt | awk -v ts="${PERIOD_PREV_2}" '{ rf = ($5+474200) / 1000000 ; print ts,$2,$3,$4,rf,$7,$8,$9,0,3 }' >> wsprdsum_ch$i.out
                         rm decoded.txt
 
                         # upload the spots
-			cat wsprdsum_ch$i.out
+			                  cat wsprdsum_ch$i.out >> decode.log
                         echo "`date`: upload fst4w by curl" >> decode.log
                         /usr/bin/curl -m 10 -F allmept=@wsprdsum_ch$i.out -F call=${MYCALL}${i} -F grid=${MYGRID} http://wsprnet.org/meptspots.php >> decode.log;
                         RESULT=$?
