@@ -77,7 +77,7 @@ class two_rx_capture(gr.top_block):
         self.sdrplay3_rspduo_0.set_bandwidth(0)
         self.sdrplay3_rspduo_0.set_antenna("Both Tuners")
         self.sdrplay3_rspduo_0.set_gain_modes(False, False)
-        self.sdrplay3_rspduo_0.set_gain(-59, -59, 'IF')
+        self.sdrplay3_rspduo_0.set_gain(-50, -50, 'IF')
         self.sdrplay3_rspduo_0.set_gain(-float('0'), -float('0'), 'RF')
         self.sdrplay3_rspduo_0.set_freq_corr(0)
         self.sdrplay3_rspduo_0.set_dc_offset_mode(False)
