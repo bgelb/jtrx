@@ -196,7 +196,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1232, 752.0]
+    coordinate: [1456, 1456.0]
     rotation: 0
     state: true
 - name: blocks_float_to_short_0
@@ -264,7 +264,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1248, 916.0]
+    coordinate: [1472, 1620.0]
     rotation: 0
     state: true
 - name: blocks_freqshift_cc_0
@@ -315,7 +315,24 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [792, 916.0]
+    coordinate: [864, 1500.0]
+    rotation: 0
+    state: true
+- name: blocks_freqshift_cc_0_0_0_0
+  id: blocks_freqshift_cc
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    freq: bw/2
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: 12e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1008, 1148.0]
     rotation: 0
     state: true
 - name: blocks_multiply_const_xx_0
@@ -351,7 +368,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1240, 836.0]
+    coordinate: [1464, 1540.0]
     rotation: 0
     state: true
 - name: blocks_multiply_const_xx_1
@@ -460,6 +477,25 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1272, 240.0]
+    rotation: 0
+    state: true
+- name: blocks_stream_mux_0_0
+  id: blocks_stream_mux
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    lengths: (1, 1)
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1264, 1304.0]
     rotation: 0
     state: true
 - name: blocks_tag_debug_0
@@ -588,6 +624,78 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1536, 492.0]
+    rotation: 0
+    state: true
+- name: epy_block_1_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      import pmt\nimport time\nfrom datetime import datetime\nfrom gnuradio import\
+      \ gr\n\nclass blk(gr.sync_block):  # other base classes are basic_block, decim_block,\
+      \ interp_block\n    \"\"\"Embedded Python Block example - a simple multiply\
+      \ const\"\"\"\n\n    def __init__(self, period_sec=120, debug=False, name_prefix=None):\
+      \  # only default arguments here\n        \"\"\"arguments to this function show\
+      \ up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n         \
+      \   self,\n            name='Rotating File Sink',   # will show up in GRC\n\
+      \            in_sig=[np.complex64],\n            out_sig=None\n        )\n \
+      \       # if an attribute with the same name as a parameter is found,\n    \
+      \    # a callback is registered (properties work, too).\n        self.period_sec\
+      \ = period_sec\n        self.outfile = None\n        self.debug = debug\n  \
+      \      self.last_rx_time = None\n        self.name_prefix = name_prefix\n\n\
+      \    def __exit__(self, *args):\n        if self.outfile:\n            print('{}:\
+      \ Closing current output file (shutdown).'.format(datetime,now))\n         \
+      \   self.outfile.close()\n\n    def is_period_start(self, last_ts, cur_ts):\n\
+      \        if last_ts:\n            last_period = last_ts[0] // self.period_sec\n\
+      \            cur_period = cur_ts[0] // self.period_sec\n            assert cur_period\
+      \ >= last_period\n            if cur_period > last_period:\n               \
+      \ return True\n        return False\n\n    def update_last_rx_time(self, cur_ts):\n\
+      \        if cur_ts:\n            self.last_rx_time = cur_ts\n\n    def work(self,\
+      \ input_items, output_items):\n\n        time_pos_list = [(None, self.last_rx_time)]\n\
+      \n        # find all rx_time tags in input\n        tags = self.get_tags_in_window(0,\
+      \ 0, len(input_items[0]))\n        for tag in tags:\n            key = pmt.to_python(tag.key)\n\
+      \            value = pmt.to_python(tag.value)\n            offset = tag.offset\n\
+      \            pos = offset - self.nitems_read(0)\n            assert pos < (self.nitems_read(0)\
+      \ + len(input_items[0]))\n            if key == 'rx_time':\n               \
+      \ if self.debug:\n                    print ('{} => {}'.format(pos, value))\n\
+      \                time_pos_list.append((pos, value))\n\n        # find all period\
+      \ start boundaries\n        start_pos = None\n        for i in range(1, len(time_pos_list)):\n\
+      \            if self.is_period_start(time_pos_list[i-1][1], time_pos_list[i][1]):\n\
+      \                # check there aren't multiple starts\n                assert\
+      \ start_pos == None\n                start_pos = time_pos_list[i]\n\n      \
+      \  self.update_last_rx_time(time_pos_list[-1][1])\n\n        if start_pos:\n\
+      \            period_name = datetime.fromtimestamp(start_pos[1][0]).strftime(\"\
+      %y%m%d_%H%M\")\n            cur_file_items = input_items[0][:start_pos[0]]\n\
+      \            new_file_items = input_items[0][start_pos[0]:]\n\n            #\
+      \ write out items for current file\n            if self.outfile:\n         \
+      \       self.outfile.write(cur_file_items.tobytes())\n                print('{}:\
+      \ Closing current output file.'.format(datetime.now()))\n                self.outfile.close()\n\
+      \n            # write out items for new file\n            if self.name_prefix\
+      \ is not None:\n              filename = self.name_prefix + period_name + '.dat'\n\
+      \            else:\n              filename = period_name + '.dat'\n        \
+      \    print ('{}: New period start at sample {} (ts={:.8f}), opening new output\
+      \ file {}.'.format(datetime.now(), start_pos[0]+self.nitems_read(0), start_pos[1][0]+start_pos[1][1],\
+      \ filename))\n            self.outfile = open(filename, 'wb')\n            self.outfile.write(new_file_items.tobytes())\n\
+      \n        elif self.outfile:\n            self.outfile.write(input_items[0].tobytes())\n\
+      \n        return len(input_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    debug: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name_prefix: '''2200m_'''
+    period_sec: '60'
+  states:
+    _io_cache: ('Rotating File Sink', 'blk', [('period_sec', '120'), ('debug', 'False'),
+      ('name_prefix', 'None')], [('0', 'complex', 1)], [], 'Embedded Python Block
+      example - a simple multiply const', ['debug', 'name_prefix', 'period_sec'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1552, 1316.0]
     rotation: 0
     state: true
 - name: epy_block_2
@@ -799,7 +907,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1248, 988.0]
+    coordinate: [1472, 1692.0]
     rotation: 0
     state: true
 - name: freq_xlating_fir_filter_xxx_1
@@ -859,7 +967,27 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [256, 900.0]
+    coordinate: [328, 1484.0]
+    rotation: 0
+    state: true
+- name: freq_xlating_fir_filter_xxx_1_1_0
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    center_freq: f_if+bw/2
+    comment: ''
+    decim: '125'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    taps: firdes.low_pass(1.0,samp_rate,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [472, 1132.0]
     rotation: 0
     state: true
 - name: gain
@@ -953,7 +1081,27 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [552, 900.0]
+    coordinate: [624, 1484.0]
+    rotation: 0
+    state: true
+- name: rational_resampler_xxx_0_0_1_0
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '4'
+    fbw: '0'
+    interp: '3'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(1.0,16e3*3,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [768, 1132.0]
     rotation: 0
     state: true
 - name: sdrplay3_rspduo_0
@@ -1034,6 +1182,8 @@ connections:
 - [blocks_freqshift_cc_0_0, '0', blocks_phase_shift_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_stream_mux_0, '1']
 - [blocks_freqshift_cc_0_0_0, '0', blocks_complex_to_real_0_1, '0']
+- [blocks_freqshift_cc_0_0_0, '0', blocks_stream_mux_0_0, '1']
+- [blocks_freqshift_cc_0_0_0_0, '0', blocks_stream_mux_0_0, '0']
 - [blocks_multiply_const_xx_0, '0', blocks_float_to_short_0_1, '0']
 - [blocks_multiply_const_xx_0_0, '0', blocks_float_to_short_0_1_0, '0']
 - [blocks_multiply_const_xx_1, '0', blocks_float_to_short_0, '0']
@@ -1043,13 +1193,17 @@ connections:
 - [blocks_phase_shift_0, '0', blocks_multiply_const_xx_2, '0']
 - [blocks_stream_mux_0, '0', blocks_tag_debug_0, '0']
 - [blocks_stream_mux_0, '0', epy_block_1, '0']
+- [blocks_stream_mux_0_0, '0', epy_block_1_0, '0']
 - [epy_block_0, '0', freq_xlating_fir_filter_xxx_1_0, '0']
+- [epy_block_0, '0', freq_xlating_fir_filter_xxx_1_1_0, '0']
 - [freq_xlating_fir_filter_xxx_1, '0', rational_resampler_xxx_0_0, '0']
 - [freq_xlating_fir_filter_xxx_1_0, '0', rational_resampler_xxx_0_0_0, '0']
 - [freq_xlating_fir_filter_xxx_1_1, '0', rational_resampler_xxx_0_0_1, '0']
+- [freq_xlating_fir_filter_xxx_1_1_0, '0', rational_resampler_xxx_0_0_1_0, '0']
 - [rational_resampler_xxx_0_0, '0', blocks_freqshift_cc_0_0, '0']
 - [rational_resampler_xxx_0_0_0, '0', blocks_freqshift_cc_0, '0']
 - [rational_resampler_xxx_0_0_1, '0', blocks_freqshift_cc_0_0_0, '0']
+- [rational_resampler_xxx_0_0_1_0, '0', blocks_freqshift_cc_0_0_0_0, '0']
 - [sdrplay3_rspduo_0, '0', epy_block_0, '0']
 - [sdrplay3_rspduo_0, '1', freq_xlating_fir_filter_xxx_1, '0']
 - [sdrplay3_rspduo_0, '1', freq_xlating_fir_filter_xxx_1_1, '0']
