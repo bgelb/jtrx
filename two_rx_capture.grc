@@ -81,6 +81,18 @@ blocks:
     coordinate: [448, 12.0]
     rotation: 0
     state: true
+- name: fc_2200
+  id: variable
+  parameters:
+    comment: ''
+    value: 136e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [400, 76.0]
+    rotation: 0
+    state: true
 - name: interp
   id: variable
   parameters:
@@ -171,6 +183,22 @@ blocks:
     coordinate: [1296, 24.0]
     rotation: 0
     state: true
+- name: blocks_complex_to_real_0_1
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1232, 752.0]
+    rotation: 0
+    state: true
 - name: blocks_float_to_short_0
   id: blocks_float_to_short
   parameters:
@@ -222,6 +250,23 @@ blocks:
     coordinate: [1488, 836.0]
     rotation: 0
     state: true
+- name: blocks_float_to_short_0_1_0
+  id: blocks_float_to_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '32768'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1248, 916.0]
+    rotation: 0
+    state: true
 - name: blocks_freqshift_cc_0
   id: blocks_freqshift_cc
   parameters:
@@ -256,6 +301,23 @@ blocks:
     coordinate: [1064, 332.0]
     rotation: 0
     state: true
+- name: blocks_freqshift_cc_0_0_0
+  id: blocks_freqshift_cc
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    freq: bw/2
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: 12e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [792, 916.0]
+    rotation: 0
+    state: true
 - name: blocks_multiply_const_xx_0
   id: blocks_multiply_const_xx
   parameters:
@@ -272,6 +334,24 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1480, 756.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_xx_0_0
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '64'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1240, 836.0]
     rotation: 0
     state: true
 - name: blocks_multiply_const_xx_1
@@ -669,12 +749,65 @@ blocks:
     coordinate: [1488, 908.0]
     rotation: 0
     state: true
+- name: epy_block_2_1_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\nimport socket\nimport struct\n\nclass blk(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
+      \ sample_rate=12000, stream_name='gnuradio'):  # only default arguments here\n\
+      \        \"\"\"arguments to this function show up as parameters in GRC\"\"\"\
+      \n        gr.sync_block.__init__(\n            self,\n            name='VBAN\
+      \ Audio Sink',   # will show up in GRC\n            in_sig=[np.short],\n   \
+      \         out_sig=None\n        )\n        # if an attribute with the same name\
+      \ as a parameter is found,\n        # a callback is registered (properties work,\
+      \ too).\n        self.sample_rate = sample_rate\n        self.stream_name =\
+      \ stream_name\n        self.framecounter = 0\n        self.sr_const = [6000,\
+      \ 12000, 24000, 48000, 96000, 192000, 384000, 8000, 16000, 32000, 64000, 128000,\
+      \ 256000, 512000,11025, 22050, 44100, 88200, 176400, 352800, 705600]\n     \
+      \   self.to_ip = '192.168.2.255'\n        self.to_port = 6980\n\n        # create\
+      \ a socket\n        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\
+      \ # UDP\n        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST,\
+      \ 1)\n\n    def make_packet(self, samples, fcount):\n        header  = b\"VBAN\"\
+      \ \n        header += bytes([self.sr_const.index(self.sample_rate)])\n     \
+      \   header += bytes([len(samples)-1])\n        header += bytes([0]) # mono 1\
+      \ channel\n        header += b'\\x01'  #VBAN_CODEC_PCM\n        header += bytes(self.stream_name\
+      \ + \"\\x00\" * (16 - len(self.stream_name)), 'utf-8')\n        header += struct.pack(\"\
+      <L\",fcount)\n        return header+samples.tobytes()\n\n    def send_packet(self,\
+      \ packet):\n        self.sock.sendto(packet, (self.to_ip, self.to_port))\n\n\
+      \    def work(self, input_items, output_items):\n        \"\"\"example: multiply\
+      \ with constant\"\"\"\n        max_samples_per_packet = 255\n        frames\
+      \ = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]),\
+      \ max_samples_per_packet)] \n        for f in frames:\n            packet =\
+      \ self.make_packet(f, self.framecounter)\n            self.send_packet(packet)\n\
+      \            self.framecounter += 1\n\n\n        return len(input_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: '12000'
+    stream_name: '''2200m'''
+  states:
+    _io_cache: ('VBAN Audio Sink', 'blk', [('sample_rate', '12000'), ('stream_name',
+      "'gnuradio'")], [('0', 'short', 1)], [], 'Embedded Python Block example - a
+      simple multiply const', ['sample_rate', 'stream_name'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1248, 988.0]
+    rotation: 0
+    state: true
 - name: freq_xlating_fir_filter_xxx_1
   id: freq_xlating_fir_filter_xxx
   parameters:
     affinity: ''
     alias: ''
-    center_freq: f_if+bw/2
+    center_freq: (fc-fc_2200)+f_if+bw/2
     comment: ''
     decim: '125'
     maxoutbuf: '0'
@@ -694,7 +827,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    center_freq: f_if+bw/2
+    center_freq: (fc-fc_2200)+f_if+bw/2
     comment: ''
     decim: '125'
     maxoutbuf: '0'
@@ -707,6 +840,26 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [552, 140.0]
+    rotation: 0
+    state: true
+- name: freq_xlating_fir_filter_xxx_1_1
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    center_freq: f_if+bw/2
+    comment: ''
+    decim: '125'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    taps: firdes.low_pass(1.0,samp_rate,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [256, 900.0]
     rotation: 0
     state: true
 - name: gain
@@ -783,6 +936,26 @@ blocks:
     coordinate: [824, 124.0]
     rotation: 0
     state: true
+- name: rational_resampler_xxx_0_0_1
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '4'
+    fbw: '0'
+    interp: '3'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(1.0,16e3*3,bw/2,100)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [552, 900.0]
+    rotation: 0
+    state: true
 - name: sdrplay3_rspduo_0
   id: sdrplay3_rspduo
   parameters:
@@ -797,7 +970,7 @@ blocks:
     antenna_both: Both Tuners
     bandwidth: '0'
     biasT: 'False'
-    center_freq: fc-f_if
+    center_freq: fc_2200-f_if
     center_freq0: '0'
     center_freq1: '0'
     comment: ''
@@ -840,7 +1013,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [440, 552.0]
+    coordinate: [1520, 292.0]
     rotation: 0
     state: true
 
@@ -849,16 +1022,20 @@ connections:
 - [blocks_complex_to_real_0, '0', blocks_multiply_const_xx_0, '0']
 - [blocks_complex_to_real_0_0, '0', blocks_multiply_const_xx_1, '0']
 - [blocks_complex_to_real_0_0_0, '0', blocks_multiply_const_xx_1_0, '0']
+- [blocks_complex_to_real_0_1, '0', blocks_multiply_const_xx_0_0, '0']
 - [blocks_float_to_short_0, '0', epy_block_2, '0']
 - [blocks_float_to_short_0_0, '0', epy_block_2_0, '0']
 - [blocks_float_to_short_0_1, '0', epy_block_2_1, '0']
+- [blocks_float_to_short_0_1_0, '0', epy_block_2_1_0, '0']
 - [blocks_freqshift_cc_0, '0', blocks_complex_to_real_0_0_0, '0']
 - [blocks_freqshift_cc_0, '0', blocks_multiply_const_xx_1_1, '0']
 - [blocks_freqshift_cc_0, '0', blocks_stream_mux_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_complex_to_real_0_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_phase_shift_0, '0']
 - [blocks_freqshift_cc_0_0, '0', blocks_stream_mux_0, '1']
+- [blocks_freqshift_cc_0_0_0, '0', blocks_complex_to_real_0_1, '0']
 - [blocks_multiply_const_xx_0, '0', blocks_float_to_short_0_1, '0']
+- [blocks_multiply_const_xx_0_0, '0', blocks_float_to_short_0_1_0, '0']
 - [blocks_multiply_const_xx_1, '0', blocks_float_to_short_0, '0']
 - [blocks_multiply_const_xx_1_0, '0', blocks_float_to_short_0_0, '0']
 - [blocks_multiply_const_xx_1_1, '0', blocks_add_xx_0, '0']
@@ -869,10 +1046,13 @@ connections:
 - [epy_block_0, '0', freq_xlating_fir_filter_xxx_1_0, '0']
 - [freq_xlating_fir_filter_xxx_1, '0', rational_resampler_xxx_0_0, '0']
 - [freq_xlating_fir_filter_xxx_1_0, '0', rational_resampler_xxx_0_0_0, '0']
+- [freq_xlating_fir_filter_xxx_1_1, '0', rational_resampler_xxx_0_0_1, '0']
 - [rational_resampler_xxx_0_0, '0', blocks_freqshift_cc_0_0, '0']
 - [rational_resampler_xxx_0_0_0, '0', blocks_freqshift_cc_0, '0']
+- [rational_resampler_xxx_0_0_1, '0', blocks_freqshift_cc_0_0_0, '0']
 - [sdrplay3_rspduo_0, '0', epy_block_0, '0']
 - [sdrplay3_rspduo_0, '1', freq_xlating_fir_filter_xxx_1, '0']
+- [sdrplay3_rspduo_0, '1', freq_xlating_fir_filter_xxx_1_1, '0']
 
 metadata:
   file_format: 1
