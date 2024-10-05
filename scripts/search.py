@@ -94,7 +94,7 @@ def main():
     bin_info = {}
 
     for phi in range(0, 350, 30):
-        for g in range(0, 9, 1):
+        for g in range(-1, 9, 1):
             #combined = downsampled[0]
             combined = combine(downsampled, g, phi)
             combined /= np.std(combined)

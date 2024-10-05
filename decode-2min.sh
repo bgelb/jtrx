@@ -15,7 +15,7 @@ while [ 1 ] ; do
 	TS=`date +%s`
 	PERIOD=`date -d@$TS +%y%m%d_%H%M`
 
-	PURGE_TS=$(($TS-172800))
+	PURGE_TS=$(($TS-64800)) # 18 hours
 	PURGE_DATE=`date -d@$PURGE_TS +%y%m%d_`
 
 	# calc last two one-minute data files to grab
