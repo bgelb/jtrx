@@ -16,7 +16,7 @@ while [ 1 ] ; do
 	PERIOD=`date -d@$TS +%y%m%d_%H%M`
 
 	PURGE_TS=$(($TS-64800)) # 18 hours
-	PURGE_DATE=`date -d@$PURGE_TS +%y%m%d_`
+	PURGE_DATE=`date -d@$PURGE_TS +%y%m%d_%H`
 
 	# calc last two one-minute data files to grab
 	PERIOD_PREV_1=`date -d@$(($TS-60)) +%y%m%d_%H%M`
@@ -124,4 +124,5 @@ while [ 1 ] ; do
 
 	echo "`date`: Purging $PURGE_DATE*" >> decode.log
 	rm ../$DATADIR/$PURGE_DATE*
+	rm ../$DATADIR/2200m_$PURGE_DATE*
 done
