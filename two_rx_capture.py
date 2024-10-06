@@ -27,10 +27,10 @@ import threading
 import two_rx_capture_epy_block_0 as epy_block_0  # embedded python block
 import two_rx_capture_epy_block_1 as epy_block_1  # embedded python block
 import two_rx_capture_epy_block_1_0 as epy_block_1_0  # embedded python block
-import two_rx_capture_epy_block_2 as epy_block_2  # embedded python block
-import two_rx_capture_epy_block_2_0 as epy_block_2_0  # embedded python block
 import two_rx_capture_epy_block_2_1 as epy_block_2_1  # embedded python block
 import two_rx_capture_epy_block_2_1_0 as epy_block_2_1_0  # embedded python block
+import two_rx_capture_epy_block_2_1_1 as epy_block_2_1_1  # embedded python block
+import two_rx_capture_epy_block_2_1_2 as epy_block_2_1_2  # embedded python block
 
 
 
@@ -80,7 +80,7 @@ class two_rx_capture(gr.top_block):
         self.sdrplay3_rspduo_0.set_bandwidth(0)
         self.sdrplay3_rspduo_0.set_antenna("Both Tuners")
         self.sdrplay3_rspduo_0.set_gain_modes(False, False)
-        self.sdrplay3_rspduo_0.set_gain(-59, -59, 'IF')
+        self.sdrplay3_rspduo_0.set_gain(-47, -47, 'IF')
         self.sdrplay3_rspduo_0.set_gain(-float('0'), -float('0'), 'RF')
         self.sdrplay3_rspduo_0.set_freq_corr(0)
         self.sdrplay3_rspduo_0.set_dc_offset_mode(False)
@@ -117,10 +117,10 @@ class two_rx_capture(gr.top_block):
         self.freq_xlating_fir_filter_xxx_1_1 = filter.freq_xlating_fir_filter_ccc(125, firdes.low_pass(1.0,samp_rate,bw/2,100), (f_if+bw/2), samp_rate)
         self.freq_xlating_fir_filter_xxx_1_0 = filter.freq_xlating_fir_filter_ccc(125, firdes.low_pass(1.0,samp_rate,bw/2,100), ((fc-fc_2200)+f_if+bw/2), samp_rate)
         self.freq_xlating_fir_filter_xxx_1 = filter.freq_xlating_fir_filter_ccc(125, firdes.low_pass(1.0,samp_rate,bw/2,100), ((fc-fc_2200)+f_if+bw/2), samp_rate)
-        self.epy_block_2_1_0 = epy_block_2_1_0.blk(sample_rate=12000, stream_name='2200m')
-        self.epy_block_2_1 = epy_block_2_1.blk(sample_rate=12000, stream_name='630m-3')
-        self.epy_block_2_0 = epy_block_2_0.blk(sample_rate=12000, stream_name='630m-1')
-        self.epy_block_2 = epy_block_2.blk(sample_rate=12000, stream_name='630m-2')
+        self.epy_block_2_1_2 = epy_block_2_1_2.blk(sample_rate=12000, stream_name='630m-1', enabled=False)
+        self.epy_block_2_1_1 = epy_block_2_1_1.blk(sample_rate=12000, stream_name='630m-2', enabled=True)
+        self.epy_block_2_1_0 = epy_block_2_1_0.blk(sample_rate=12000, stream_name='2200m', enabled=True)
+        self.epy_block_2_1 = epy_block_2_1.blk(sample_rate=12000, stream_name='630m-3', enabled=False)
         self.epy_block_1_0 = epy_block_1_0.blk(period_sec=60, debug=False, name_prefix='2200m_')
         self.epy_block_1 = epy_block_1.blk(period_sec=60, debug=False)
         self.epy_block_0 = epy_block_0.blk(period=1)
@@ -158,8 +158,8 @@ class two_rx_capture(gr.top_block):
         self.connect((self.blocks_complex_to_real_0_0, 0), (self.blocks_multiply_const_xx_1, 0))
         self.connect((self.blocks_complex_to_real_0_0_0, 0), (self.blocks_multiply_const_xx_1_0, 0))
         self.connect((self.blocks_complex_to_real_0_1, 0), (self.blocks_multiply_const_xx_0_0, 0))
-        self.connect((self.blocks_float_to_short_0, 0), (self.epy_block_2, 0))
-        self.connect((self.blocks_float_to_short_0_0, 0), (self.epy_block_2_0, 0))
+        self.connect((self.blocks_float_to_short_0, 0), (self.epy_block_2_1_1, 0))
+        self.connect((self.blocks_float_to_short_0_0, 0), (self.epy_block_2_1_2, 0))
         self.connect((self.blocks_float_to_short_0_1, 0), (self.epy_block_2_1, 0))
         self.connect((self.blocks_float_to_short_0_1_0, 0), (self.epy_block_2_1_0, 0))
         self.connect((self.blocks_freqshift_cc_0, 0), (self.blocks_complex_to_real_0_0_0, 0))

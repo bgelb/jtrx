@@ -14,7 +14,7 @@ import struct
 class blk(gr.sync_block):  # other base classes are basic_block, decim_block, interp_block
     """Embedded Python Block example - a simple multiply const"""
 
-    def __init__(self, sample_rate=12000, stream_name='gnuradio'):  # only default arguments here
+    def __init__(self, sample_rate=12000, stream_name='gnuradio', enabled=True):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,
@@ -30,6 +30,7 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
         self.sr_const = [6000, 12000, 24000, 48000, 96000, 192000, 384000, 8000, 16000, 32000, 64000, 128000, 256000, 512000,11025, 22050, 44100, 88200, 176400, 352800, 705600]
         self.to_ip = '192.168.2.255'
         self.to_port = 6980
+        self.enabled = enabled
 
         # create a socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
@@ -50,12 +51,13 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
 
     def work(self, input_items, output_items):
         """example: multiply with constant"""
-        max_samples_per_packet = 255
-        frames = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]), max_samples_per_packet)] 
-        for f in frames:
-            packet = self.make_packet(f, self.framecounter)
-            self.send_packet(packet)
-            self.framecounter += 1
+        if self.enabled:
+          max_samples_per_packet = 255
+          frames = [input_items[0][i:i+max_samples_per_packet] for i in range(0, len(input_items[0]), max_samples_per_packet)] 
+          for f in frames:
+              packet = self.make_packet(f, self.framecounter)
+              self.send_packet(packet)
+              self.framecounter += 1
 
 
         return len(input_items[0])
